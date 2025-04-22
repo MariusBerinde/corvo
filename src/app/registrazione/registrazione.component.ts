@@ -1,32 +1,10 @@
+const passwordPattern = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[\.\,\/\#\!\?\$\%\\\^\&\*\;\:\{\}\=\-\_\(\)\[\]\\\|'&|\`\~@\.])[^]{6,}$/;
 import { Component } from '@angular/core';
-import {FormControl, FormGroup, ReactiveFormsModule} from '@angular/forms';
+import {FormControl, FormGroup, ReactiveFormsModule,Validators} from '@angular/forms';
 @Component({
   selector: 'app-registrazione',
   imports: [ReactiveFormsModule],
-  template: `
-  <p> nuovo utente </p>
-<section class="listing-apply">
-  <form [formGroup]="formRegistrazione" (submit)="submitRegistrazione()">
-    <label for="email">Inserisci email:</label>
-      <input id="email" type="email" formControlName="email"/>
-
-    <label for="pwd">Inserisci password:</label>
-    <input id="pwd" type="password" formControlName="pwd"/>
-
-    <label for="pwdR">Conferma password:</label>
-    <input id="pwdR" type="password" formControlName="pwdR"/>
-  <button type="submit" >Invia dati </button>
-  </form>
-</section >
-
-  <section>
-    valori:inseriti
-    <p> email inserita : {{emailI}}</p>
-    <p> pwd inserita : {{pwdI}}</p>
-    <p> pwdR inserita : {{pwdRI}}</p>
-    <p> valore nextStep : {{nextStep}}</p>
-  </section>
-  `,
+  templateUrl:'./registrazione.component.html',
   styleUrl: './registrazione.component.css'
 })
 export class RegistrazioneComponent {
@@ -35,9 +13,9 @@ export class RegistrazioneComponent {
   pwdRI='';
   nextStep:boolean=false;
   formRegistrazione = new FormGroup({
-    email: new FormControl(''),
-    pwd: new FormControl(''),
-    pwdR: new FormControl(''),
+    email: new FormControl('',[Validators.required, Validators.email]),
+    pwd: new FormControl('',[Validators.required ,Validators.pattern(passwordPattern)]),
+    pwdR: new FormControl('',[Validators.required ,Validators.pattern(passwordPattern)]),
 
   });
 submitRegistrazione(){

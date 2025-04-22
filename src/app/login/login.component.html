@@ -1,1 +1,44 @@
-<p>login works!</p>
+
+  <p> Registrazione utente locale</p>
+<section class="listing-apply">
+    <fieldset>
+      <legend>Login utente locale</legend>
+
+  <form [formGroup]="formLogin" (submit)="submitLogin()">
+    <label for="email">Inserisci email:</label>
+      <input id="email" type="email" formControlName="email"/>
+        @if(formLogin.controls['email'].errors?.['required']){
+        <span>valore richiesto</span>
+
+        }
+
+        @if(formLogin.controls['email'].errors?.['email']){
+        <span>formato email non valido</span>
+        }
+
+        @if(formLogin.controls['email'].errors?.['email']){
+        <span>formato email non valido</span>
+        }
+        <br>
+    <label for="pwd">Inserisci password:</label>
+    <input id="pwd" type="password" formControlName="pwd"/>
+
+        @if(formLogin.controls['pwd'].errors?.['pattern']){
+        <span>formato passwor errato : ti ricordo che la passwrod che conterene almeno 6 caratteri e ci devono essere una maiuscola,una pinuscola e un carattere speciale </span>
+        }
+        @if(formLogin.controls['pwd'].errors?.['required']){
+        <span>valore richiesto</span>
+
+        }
+        <br>
+  <button type="submit" >Invia dati </button>
+  </form>
+    </fieldset>
+</section >
+<br>
+  <section>
+    valori:inseriti
+    <p> email inserita : {{emailI}}</p> <br>
+    <p> pwd inserita : {{pwdI}}</p><br>
+    <p> valore nextStep : {{nextStep}}</p>
+  </section>

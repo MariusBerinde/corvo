@@ -1,1 +1,54 @@
-<p>registrazione works!</p>
+  <p> nuovo utente </p>
+  <fieldset>
+<section class="listing-apply">
+
+      <legend>Registrazione utente locale</legend>
+  <form [formGroup]="formRegistrazione" (submit)="submitRegistrazione()">
+    <label for="email">Inserisci email:</label>
+      <input id="email" type="email" formControlName="email" />
+        @if(formRegistrazione.controls['email'].errors?.['required']){
+        <span>valore richiesto</span>
+
+        }
+
+        @if(formRegistrazione.controls['email'].errors?.['email']){
+        <span>formato email non valido</span>
+        }
+
+        @if(formRegistrazione.controls['email'].errors?.['email']){
+        <span>formato email non valido</span>
+        }
+<br>
+    <label for="pwd">Inserisci password:</label>
+    <input id="pwd" type="password" formControlName="pwd" />
+
+        @if(formRegistrazione.controls['pwd'].errors?.['pattern']){
+        <span>formato passwor errato : ti ricordo che la passwrod che conterene almeno 6 caratteri e ci devono essere una maiuscola,una pinuscola e un carattere speciale </span>
+        }
+        @if(formRegistrazione.controls['pwd'].errors?.['required']){
+        <span>valore richiesto</span>
+
+        }
+<br>
+    <label for="pwdR">Conferma password:</label>
+    <input id="pwdR" type="password" formControlName="pwdR" />
+
+        @if(formRegistrazione.controls['pwdR'].errors?.['pattern']){
+        <span>formato passwor errato : ti ricordo che la passwrod che conterene almeno 6 caratteri e ci devono essere una maiuscola,una pinuscola e un carattere speciale </span>
+        }
+        @if(formRegistrazione.controls['pwdR'].errors?.['required']){
+        <span>valore richiesto</span>
+
+        }
+<br>
+  <button type="submit" >Invia dati </button>
+  </form>
+</section >
+</fieldset>
+  <section>
+    valori:inseriti
+    <p> email inserita : {{emailI}}</p>
+    <p> pwd inserita : {{pwdI}}</p>
+    <p> pwdR inserita : {{pwdRI}}</p>
+    <p> valore nextStep : {{nextStep}}</p>
+  </section>
