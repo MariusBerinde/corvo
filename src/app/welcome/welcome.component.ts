@@ -4,10 +4,13 @@ import {LoginComponent } from '../login/login.component';
 import {RegistrazioneComponent} from '../registrazione/registrazione.component';
 import { Router } from '@angular/router';
 import {ScritturaLocaleService} from '../scrittura-locale.service';
+import {MatButtonModule} from '@angular/material/button';
+import {MatCardModule} from '@angular/material/card';
+
 @Component({
   selector: 'app-welcome',
-  imports: [],
-  templateUrl: './welcome.component.html',
+  imports: [MatButtonModule,MatCardModule],
+  templateUrl: './welcome.component2.html',
   styleUrl: './welcome.component.css'
 })
 export class WelcomeComponent {

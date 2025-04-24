@@ -1,0 +1,61 @@
+/* Stile per centrare la mat-card nella pagina */
+.centered-card-container {
+  display: flex;
+  justify-content: center; /* Centra orizzontalmente */
+  align-items: center; /* Centra verticalmente */
+  min-height: 100vh; /* Assicura che prenda almeno l'altezza della viewport */
+  background-color: #f4f4f4; /* Un leggero sfondo per contrasto */
+  padding: 20px; /* Un po' di spazio intorno al contenitore */
+}
+
+mat-card {
+  width: 90%; /* Imposta una larghezza massima per la card */
+  max-width: 500px; /* Limita ulteriormente la larghezza su schermi più grandi */
+}
+
+/* Stile per l'header della card */
+mat-card-header {
+  display: flex;
+  justify-content: center; /* Centra il titolo */
+  margin-bottom: 16px; /* Spazio sotto l'header */
+}
+
+mat-card-title {
+  font-size: 2em; /* Rende il titolo più grande */
+  font-weight: bold;
+  color: #3f51b5; /* Un colore primario di Angular Material */
+}
+
+/* Stile per il contenuto della card */
+mat-card-content {
+  padding: 16px; /* Spazio interno al contenuto */
+  text-align: center; /* Centra il testo */
+}
+
+mat-card-content p {
+  line-height: 1.6; /* Migliora la leggibilità del testo */
+  color: #555;
+}
+
+mat-card-content br {
+  margin-bottom: 8px; /* Spazio dopo l'interruzione di riga */
+}
+
+/* Stile per la navigazione e le azioni */
+nav {
+  display: flex;
+  justify-content: center; /* Centra i bottoni */
+  margin-top: 24px; /* Spazio sopra i bottoni */
+}
+
+mat-card-actions {
+  display: flex;
+  gap: 10px; /* Spazio tra i bottoni */
+}
+
+/* Puoi aggiungere stili specifici per i bottoni se necessario */
+/*
+button[mat-raised-button] {
+  // I tuoi stili personalizzati per i bottoni
+}
+*/
