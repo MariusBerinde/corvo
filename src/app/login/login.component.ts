@@ -1,7 +1,7 @@
 const passwordPattern = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[\.\,\/\#\!\?\$\%\\\^\&\*\;\:\{\}\=\-\_\(\)\[\]\\\|'&|\`\~@\.])[^]{6,}$/;
 import { Component } from '@angular/core';
 import {FormControl, FormGroup, ReactiveFormsModule,Validators} from '@angular/forms';
-
+import {ScritturaLocaleService} from '../scrittura-locale.service';
 @Component({
   selector: 'app-login',
   imports: [ReactiveFormsModule],
@@ -14,6 +14,7 @@ export class LoginComponent {
   emailI='';
   pwdI='';
   nextStep:boolean=false;
+  constructor(private lS:ScritturaLocaleService){}
   formLogin = new FormGroup({
     email: new FormControl('',[Validators.required, Validators.email]),
     pwd: new FormControl('',[Validators.required ,Validators.pattern(passwordPattern)]),

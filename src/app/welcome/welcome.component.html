@@ -65,8 +65,16 @@
 <main class="main">
   <!--TODO:inserire logo-->
     <h1>Benvenuto su {{title}}  </h1>
-</main>
+  <br>
 
+
+</main>
+<section>
+  <button type="button" class="display-child-element" (click)="scrivi()" >Scrivi file</button>
+  <button type="button" class="display-child-element" (click)="leggi()" >Leggi file</button>
+  <br>
+  <p>valore letto {{valore_letto}}</p>
+</section>
 <nav>
 
     <button type="button" class="display-child-element" (click)="navigateToLogin()">
