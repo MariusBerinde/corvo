@@ -26,14 +26,12 @@ navigateToReg(){
   this._router.navigate(['../registrazione/']);
 
 }
-scrivi(){
-  this.lS.saveData('email','lol');
-}
+
 leggi(){
   const sup=this.lS.getData('email');
   this.valore_letto=this.lS.getData('email')??"default";
   console.log("valore letto",sup);
-
 }
 
+//TODO: inserire controllo pulsante login
 }

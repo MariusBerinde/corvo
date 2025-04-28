@@ -1,26 +1,24 @@
-/*
-.listing-apply .section-heading {
-  font-size: 18pt;
-  margin-bottom: 15px;
+.centered-card-container {
+  display: flex;
+  justify-content: center; /* Centra orizzontalmente */
+  align-items: center;    /* Centra verticalmente */
+  min-height: 100vh;      /* Assicura che prenda almeno l'altezza della viewport */
+  background-color: #f0f2f5; /* Un leggero sfondo per contrasto (opzionale) */
 }
 
-label, input {
-  display: block;
+mat-card {
+  width: 400px; /* Imposta una larghezza fissa per la card (regola a tuo piacimento) */
+  max-width: 90%; /* Assicura che non sia troppo grande su schermi piccoli */
 }
-label {
-  color: var(--secondary-color);
-  font-weight: bold;
-  text-transform: uppercase;
-  font-size: 12pt;
+
+mat-card-content {
+  padding: 16px; /* Aggiunge un po' di spazio interno al contenuto della card */
 }
-input {
-  font-size: 16pt;
-  margin-bottom: 15px;
-  padding: 10px;
-  width: 400px;
-  border-top: none;
-  border-right: none;
-  border-left: none;
-  border-bottom: solid .3px;
+
+mat-form-field {
+  width: 100%; /* Fa in modo che i campi di input prendano tutta la larghezza disponibile */
 }
-*/
+
+.mat-mdc-button.mat-primary, .mat-primary { /* Stile per il pulsante primario (potrebbe variare leggermente con le versioni più recenti di Material) */
+  /* Puoi aggiungere ulteriori stili qui se necessario */
+}

@@ -1,32 +1,49 @@
 const passwordPattern = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[\.\,\/\#\!\?\$\%\\\^\&\*\;\:\{\}\=\-\_\(\)\[\]\\\|'&|\`\~@\.])[^]{6,}$/;
-import { Component } from '@angular/core';
+import { Component,OnInit  } from '@angular/core';
 import {FormControl, FormGroup, ReactiveFormsModule,Validators} from '@angular/forms';
 import {ScritturaLocaleService} from '../scrittura-locale.service';
+import {MatButtonModule} from '@angular/material/button';
+import {MatCardModule} from '@angular/material/card';
+import {MatFormFieldModule} from '@angular/material/form-field';
+import {MatInputModule} from '@angular/material/input';
+import {MatIconModule} from '@angular/material/icon';
 @Component({
   selector: 'app-login',
-  imports: [ReactiveFormsModule],
-
-  templateUrl: './login.component.html',
-  styleUrl: './login.component.css'
+  imports: [MatButtonModule,MatCardModule,MatFormFieldModule,MatInputModule,MatIconModule,ReactiveFormsModule],
+  templateUrl: './login.component2.html',
+  styleUrl: './login.component.css',
 })
 
 export class LoginComponent {
   emailI='';
   pwdI='';
   nextStep:boolean=false;
+  hide = true;
   constructor(private lS:ScritturaLocaleService){}
   formLogin = new FormGroup({
     email: new FormControl('',[Validators.required, Validators.email]),
     pwd: new FormControl('',[Validators.required ,Validators.pattern(passwordPattern)]),
   });
-submitLogin(){
-  if(this.formLogin.controls['pwd'].errors?.['pattern'] && this.formLogin.controls['email'].errors?.['email']) {
-    this.emailI=this.formLogin.value.email??'null';
-    this.pwdI=this.formLogin.value.pwd??'null';
+  submitLogin(){
+
+    if (this.formLogin.valid) {
+      this.emailI = this.formLogin.value.email ?? '';
+      this.pwdI = this.formLogin.value.pwd ?? '';
+      this.nextStep = true; // Imposta nextStep a true se il form è valido
+      console.log("Form valido - Email:", this.emailI, "Password:", this.pwdI);
+      // Qui puoi inserire la logica per inviare i dati o mostrare un messaggio di successo
+    } else {
+      console.log("Il form non è valido. Errori:", this.formLogin.errors);
+      this.nextStep = false; // Assicurati che nextStep sia false se ci sono errori
+      // Qui puoi gestire gli errori del form, ad esempio mostrando messaggi all'utente
+    }
   }
-
-
-}
+  togglePasswordVisibility() {
+    this.hide = !this.hide;
+  }
+  checkCredenzialsDb():boolean{
+    return true;
+  }
 }
 
 /*

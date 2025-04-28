@@ -1,0 +1,52 @@
+<div class="centered-card-container">
+  <mat-card>
+    <mat-card-header>
+      <mat-card-title>Corvo</mat-card-title>
+    </mat-card-header>
+    <mat-card-content>
+      <p> Login utente locale </p>
+      <br>
+
+      <form [formGroup]="formLogin" (submit)="submitLogin()">
+        <mat-form-field>
+          <mat-label >Inserisci email</mat-label>
+          <input id="email" matInput type="email" formControlName="email"/>
+          @if(formLogin.controls['email'].errors?.['required']){
+            <mat-error>valore richiesto</mat-error>
+          }
+          @if(formLogin.controls['email'].errors?.['email']){
+            <mat-error>formato email non valido</mat-error>
+          }
+          @if(formLogin.controls['email'].errors?.['email']){
+            <mat-error>formato email non valido</mat-error>
+          }
+        </mat-form-field>
+        <br>
+
+        <mat-form-field>
+          <mat-label >Inserisci password</mat-label>
+          <input id="pwd" matInput [type]="hide ? 'password' : 'text'" formControlName="pwd"/>
+          <button
+            mat-icon-button
+            matSuffix
+            (click)="togglePasswordVisibility()"
+            [attr.aria-label]="hide ? 'Mostra password' : 'Nascondi password'"
+            [attr.aria-pressed]="!hide"
+          >
+            <mat-icon>{{ hide ? 'visibility_off' : 'visibility' }}</mat-icon>
+          </button>
+          @if(formLogin.controls['pwd'].errors?.['pattern']){
+            <mat-error>formato passwor errato : ti ricordo che la passwrod che conterene almeno 6 caratteri e ci devono essere una maiuscola,una pinuscola e un carattere speciale </mat-error>
+          }
+          @if(formLogin.controls['pwd'].errors?.['required']){
+            <mat-error>valore richiesto</mat-error>
+          }
+        </mat-form-field>
+
+        <br>
+        <button mat-raised-button color="primary" type="submit">Invia dati</button>
+      </form>
+      <br>
+    </mat-card-content>
+  </mat-card>
+</div>
