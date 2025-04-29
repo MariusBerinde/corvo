@@ -6,8 +6,8 @@ import {MatCardModule} from '@angular/material/card';
 import {MatToolbarModule} from '@angular/material/toolbar';
 import {MatMenuModule } from '@angular/material/menu'
 import {MatListModule} from '@angular/material/list';
-import {Server} from '../interfaces/server';
-import {GestioneServerService } from '../gestione-server.service';
+import {Server} from '../../interfaces/server';
+import {GestioneServerService } from '../../services/gestione-server.service';
 @Component({
   selector: 'app-home',
   templateUrl: './home.component.html',
@@ -17,7 +17,6 @@ import {GestioneServerService } from '../gestione-server.service';
 })
 
 export class HomeComponent {
-  ip="192.168.10.1";
   userName:string="";
   servers:Server[]=[];
 

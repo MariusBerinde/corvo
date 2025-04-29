@@ -3,7 +3,7 @@ import { RouterOutlet } from '@angular/router';
 import {LoginComponent } from '../login/login.component';
 import {RegistrazioneComponent} from '../registrazione/registrazione.component';
 import { Router } from '@angular/router';
-import {ScritturaLocaleService} from '../scrittura-locale.service';
+import {ScritturaLocaleService} from '../../services/scrittura-locale.service';
 import {MatButtonModule} from '@angular/material/button';
 import {MatCardModule} from '@angular/material/card';
 
