@@ -1,1 +1,60 @@
-<p>home works!</p>
+<mat-toolbar>
+  <span>Corvo</span>
+  <span class="spacer"></span>
+  <button mat-icon-button [matMenuTriggerFor]="userMenu">
+    <mat-icon>account_circle</mat-icon>
+  </button>
+  <mat-menu #userMenu="matMenu">
+    <button mat-menu-item [routerLink]="['/user']">
+      <span>{{ userName }}</span>
+    </button>
+    <button mat-menu-item (click)="logout()">
+      <mat-icon>logout</mat-icon>
+      <span>Logout</span>
+    </button>
+  </mat-menu>
+</mat-toolbar>
+
+<mat-card>
+  <mat-card-header>
+    <mat-card-title>Lista Server</mat-card-title>
+  </mat-card-header>
+
+  <mat-card-content>
+
+
+
+    <-!-TODO:da inserire mat-nav-list dopo aver creato dettagli server->
+      <mat-list>
+        @for(val of servers; track val.id) {
+        <mat-accordion>
+          <mat-expansion-panel hideToggle>
+            <mat-expansion-panel-header class="server-header">
+              <span class="status-indicator" [class.online]="val.state" [class.offline]="!val.state"></span>
+              <mat-panel-title>IP: </mat-panel-title>
+              <mat-panel-description >{{ val.ip }}</mat-panel-description>
+            </mat-expansion-panel-header>
+
+            <div class="server-details">
+              <span>Ci dovrebbero essere i servizi ma per il momento metto i dati del server</span>
+              <br>
+              <span>ID: {{ val.id }}</span>
+              <br>
+              <span>Stato: {{ val.state ? 'Online' : 'Offline' }}</span>
+              <br>
+              @if (val.name) {
+              <span>Nome: {{ val.name }}</span>
+              <br>
+              }
+              @if (val.descr) {
+              <span>Descr: {{ val.descr }}</span>
+              <br>
+              }
+            </div>
+          </mat-expansion-panel>
+        </mat-accordion>
+        }
+      </mat-list>
+
+  </mat-card-content>
+</mat-card>

@@ -1,0 +1,27 @@
+.spacer {
+  flex: 1 1 auto;
+}
+
+  .server-header {
+    display: flex;
+    align-items: center; /* Allinea verticalmente gli elementi */
+  }
+
+  .status-indicator {
+    width: 10px;
+    height: 10px;
+    border-radius: 50%; /* Crea un pallino */
+    margin-right: 8px; /* Spazio tra il pallino e il testo */
+  }
+
+  .status-indicator.online {
+    background-color: green;
+  }
+
+  .status-indicator.offline {
+    background-color: red;
+  }
+
+  .server-details {
+    padding: 16px; /* Aggiunge un po' di spazio intorno ai dettagli */
+  }

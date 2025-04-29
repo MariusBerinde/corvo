@@ -1,12 +1,14 @@
 const passwordPattern = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[\.\,\/\#\!\?\$\%\\\^\&\*\;\:\{\}\=\-\_\(\)\[\]\\\|'&|\`\~@\.])[^]{6,}$/;
-import { Component,OnInit  } from '@angular/core';
+import {Component,OnInit  } from '@angular/core';
 import {FormControl, FormGroup, ReactiveFormsModule,Validators} from '@angular/forms';
-import {ScritturaLocaleService} from '../scrittura-locale.service';
 import {MatButtonModule} from '@angular/material/button';
 import {MatCardModule} from '@angular/material/card';
 import {MatFormFieldModule} from '@angular/material/form-field';
-import {MatInputModule} from '@angular/material/input';
 import {MatIconModule} from '@angular/material/icon';
+import {MatInputModule} from '@angular/material/input';
+import {Router } from '@angular/router';
+import {ScritturaLocaleService} from '../scrittura-locale.service';
+import {HomeComponent} from '../home/home.component';
 @Component({
   selector: 'app-login',
   imports: [MatButtonModule,MatCardModule,MatFormFieldModule,MatInputModule,MatIconModule,ReactiveFormsModule],
@@ -19,7 +21,7 @@ export class LoginComponent {
   pwdI='';
   nextStep:boolean=false;
   hide = true;
-  constructor(private lS:ScritturaLocaleService){}
+  constructor(private lS:ScritturaLocaleService,private _router: Router){}
   formLogin = new FormGroup({
     email: new FormControl('',[Validators.required, Validators.email]),
     pwd: new FormControl('',[Validators.required ,Validators.pattern(passwordPattern)]),
@@ -31,6 +33,9 @@ export class LoginComponent {
       this.pwdI = this.formLogin.value.pwd ?? '';
       this.nextStep = true; // Imposta nextStep a true se il form è valido
       console.log("Form valido - Email:", this.emailI, "Password:", this.pwdI);
+      if(this.checkCredenzialsDb()){
+        this._router.navigate(['../home/']);
+      }
       // Qui puoi inserire la logica per inviare i dati o mostrare un messaggio di successo
     } else {
       console.log("Il form non è valido. Errori:", this.formLogin.errors);

@@ -1,14 +1,14 @@
 const passwordPattern = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[\.\,\/\#\!\?\$\%\\\^\&\*\;\:\{\}\=\-\_\(\)\[\]\\\|'&|\`\~@\.])[^]{6,}$/;
+
+import {Component } from '@angular/core';
+import {FormControl, FormGroup, ReactiveFormsModule,Validators} from '@angular/forms';
 import {MatButtonModule} from '@angular/material/button';
 import {MatCardModule} from '@angular/material/card';
 import {MatFormFieldModule} from '@angular/material/form-field';
-import {MatInputModule} from '@angular/material/input';
 import {MatIconModule} from '@angular/material/icon';
-import { Component } from '@angular/core';
-import {FormControl, FormGroup, ReactiveFormsModule,Validators} from '@angular/forms';
+import {MatInputModule} from '@angular/material/input';
+import {Router } from '@angular/router';
 import {ScritturaLocaleService} from '../scrittura-locale.service';
-import { Router } from '@angular/router';
-
 import {WelcomeComponent } from '../welcome/welcome.component';
 @Component({
   selector: 'app-registrazione',
@@ -54,9 +54,13 @@ submitRegistrazione(){
 
   console.log("valore scritto:",this.emailI);
   console.log("Provo a navigare verso welcome");
-  //this._router.navigate(['']);
+  if(this.checkRegistration())
+    this._router.navigate(['']);
   }
 }
-
+checkRegistration():boolean{
+  //TODO: implementare condizioni
+  return true;
+}
 
 }
