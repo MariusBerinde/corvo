@@ -10,6 +10,7 @@ import {MatInputModule} from '@angular/material/input';
 import {Router } from '@angular/router';
 import {ScritturaLocaleService} from '../../services/scrittura-locale.service';
 import {WelcomeComponent } from '../welcome/welcome.component';
+import {AuthService } from '../../services/auth.service';
 @Component({
   selector: 'app-registrazione',
   imports: [MatButtonModule,MatCardModule,MatFormFieldModule,MatInputModule,MatIconModule,ReactiveFormsModule],
@@ -33,7 +34,7 @@ togglePwdVisibility(){
 togglePwdRVisibility(){
   this.hidePwdR=!this.hidePwdR;
 }
-constructor(private _router: Router,private lS:ScritturaLocaleService) { }
+constructor(private _router: Router,private lS:ScritturaLocaleService,private auth:AuthService) { }
   formRegistrazione = new FormGroup({
     email: new FormControl('',[Validators.required, Validators.email]),
     pwd: new FormControl('',[Validators.required ,Validators.pattern(passwordPattern)]),
@@ -50,12 +51,22 @@ submitRegistrazione(){
   const pwdUguali=this.pwdI!==this.pwdRI;
 
   this.nextStep=pwdUguali ;
-  this.lS.saveData('email',this.emailI);
 
   console.log("valore scritto:",this.emailI);
   console.log("Provo a navigare verso welcome");
-  if(this.checkRegistration())
-    this._router.navigate(['']);
+  if(this.checkRegistration()){
+    let username=this.emailI.substring(0,this.emailI.indexOf('@'));
+
+    if(this.auth.createUser(this.emailI,username,this.pwdI)){
+      this.lS.saveData('email',this.emailI);
+      this._router.navigate(['']);
+    }
+  }
+  else{
+    let username=this.emailI.substring(0,this.emailI.indexOf('@'));
+    console.log("test estrazione username:",username);
+  }
+
   }
 }
 checkRegistration():boolean{

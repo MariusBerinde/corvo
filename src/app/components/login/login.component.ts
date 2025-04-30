@@ -9,6 +9,9 @@ import {MatInputModule} from '@angular/material/input';
 import {Router } from '@angular/router';
 import {ScritturaLocaleService} from '../../services/scrittura-locale.service';
 import {HomeComponent} from '../home/home.component';
+import {AuthService } from '../../services/auth.service';
+import * as bcrypt from 'bcryptjs';
+
 @Component({
   selector: 'app-login',
   imports: [MatButtonModule,MatCardModule,MatFormFieldModule,MatInputModule,MatIconModule,ReactiveFormsModule],
@@ -21,7 +24,7 @@ export class LoginComponent {
   pwdI='';
   nextStep:boolean=false;
   hide = true;
-  constructor(private lS:ScritturaLocaleService,private _router: Router){}
+  constructor(private lS:ScritturaLocaleService,private _router: Router,private auth:AuthService){}
   formLogin = new FormGroup({
     email: new FormControl('',[Validators.required, Validators.email]),
     pwd: new FormControl('',[Validators.required ,Validators.pattern(passwordPattern)]),
@@ -34,11 +37,21 @@ export class LoginComponent {
       this.nextStep = true; // Imposta nextStep a true se il form è valido
       console.log("Form valido - Email:", this.emailI, "Password:", this.pwdI);
       if(this.checkCredenzialsDb()){
+        this.lS.saveData('email',this.emailI);
         this._router.navigate(['../home/']);
+      }else{
+        let pwd='Manag3r_';
+        let hash=this.auth.creaHash("Manag3r_");
+        let out="Pwd="+hash;
+
+        //alert("Nome utente o password non validi");
+        alert(out);
       }
       // Qui puoi inserire la logica per inviare i dati o mostrare un messaggio di successo
     } else {
+
       console.log("Il form non è valido. Errori:", this.formLogin.errors);
+
       this.nextStep = false; // Assicurati che nextStep sia false se ci sono errori
       // Qui puoi gestire gli errori del form, ad esempio mostrando messaggi all'utente
     }
@@ -47,7 +60,7 @@ export class LoginComponent {
     this.hide = !this.hide;
   }
   checkCredenzialsDb():boolean{
-    return true;
+    return this.auth.checkUserPwd(this.emailI,this.pwdI);
   }
 }
 

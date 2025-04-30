@@ -1,7 +1,8 @@
 # Corvo
 
 This project was generated using [Angular CLI](https://github.com/angular/angular-cli) version 19.2.7.
-
+## External libs 
+Assure that you have installed bcryptjs before run the app or install with the command npm install bcryptjs
 ## Development server
 
 To start a local development server, run:
