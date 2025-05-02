@@ -1,1 +1,121 @@
-<p>user works!</p>
+
+<mat-toolbar color="primary">
+  <span class="toolbar-title">🦅 Corvo</span>
+  <span class="spacer"></span>
+  <button mat-icon-button [matMenuTriggerFor]="userMenu">
+    <mat-icon>account_circle</mat-icon>
+  </button>
+  <mat-menu #userMenu="matMenu">
+    <button mat-menu-item [routerLink]="['/home']">
+      <mat-icon>home</mat-icon>
+      <span>Home</span>
+    </button>
+    <button mat-menu-item (click)="logout()">
+      <mat-icon>logout</mat-icon>
+      <span>Logout</span>
+    </button>
+  </mat-menu>
+</mat-toolbar>
+
+<mat-card class="user-card">
+  <mat-card-header>
+    <mat-card-title>
+      👤 Corvo: {{ actualUser.username }}
+    </mat-card-title>
+  </mat-card-header>
+
+  <mat-card-content>
+    <div class="user-details">
+      <mat-icon>person</mat-icon> <strong>Username:</strong> {{ actualUser.username }}<br>
+      <mat-icon>email</mat-icon> <strong>Email:</strong> {{ actualUser.email }}<br>
+      <mat-icon>badge</mat-icon> <strong>Ruolo:</strong>
+      {{ actualUser.role === Role.Supervisor ? 'Supervisor' : 'Worker' }}
+    </div>
+
+    <mat-divider class="my-divider"></mat-divider>
+
+    <mat-tab-group>
+      <mat-tab label="Riepilogo operazioni">
+        <div class="tab-section">
+        </div>
+      </mat-tab>
+
+      <mat-tab label="Cambia password">
+        <div class="tab-section">
+
+          <form [formGroup]="formResetPwd" (ngSubmit)="submitChangePwd()" class="pwd-form">
+            <mat-form-field appearance="outline" class="full-width">
+              <mat-label>Inserisci vecchia password</mat-label>
+              <input matInput [type]="hides[0] ? 'password' : 'text'" formControlName="pwdOld" />
+              <button
+                mat-icon-button matSuffix
+                type="button"
+                (click)="togglePasswordVisibility(0)"
+                [attr.aria-label]="hides[0] ? 'Mostra password' : 'Nascondi password'"
+              >
+                <mat-icon>{{ hides[0] ? 'visibility_off' : 'visibility' }}</mat-icon>
+              </button>
+              <mat-error *ngIf="formResetPwd.controls['pwdOld'].hasError('pattern')">
+                La password deve contenere almeno 6 caratteri, una maiuscola, una minuscola e un carattere speciale.
+              </mat-error>
+              <mat-error *ngIf="formResetPwd.controls['pwdOld'].hasError('required')">
+                Campo obbligatorio
+              </mat-error>
+            </mat-form-field>
+
+            <mat-form-field appearance="outline" class="full-width">
+              <mat-label>Inserisci nuova password</mat-label>
+              <input matInput [type]="hides[1] ? 'password' : 'text'" formControlName="pwd" />
+              <button
+                mat-icon-button matSuffix
+                type="button"
+                (click)="togglePasswordVisibility(1)"
+                [attr.aria-label]="hides[1] ? 'Mostra password' : 'Nascondi password'"
+              >
+                <mat-icon>{{ hides[1] ? 'visibility_off' : 'visibility' }}</mat-icon>
+              </button>
+              <mat-error *ngIf="formResetPwd.controls['pwd'].hasError('pattern')">
+                La password deve contenere almeno 6 caratteri, una maiuscola, una minuscola e un carattere speciale.
+              </mat-error>
+              <mat-error *ngIf="formResetPwd.controls['pwd'].hasError('required')">
+                Campo obbligatorio
+              </mat-error>
+            </mat-form-field>
+
+            <mat-form-field appearance="outline" class="full-width">
+              <mat-label>Reinserisci nuova password</mat-label>
+              <input matInput [type]="hides[2] ? 'password' : 'text'" formControlName="pwdR" />
+              <button
+                mat-icon-button matSuffix
+                type="button"
+                (click)="togglePasswordVisibility(2)"
+                [attr.aria-label]="hides[2] ? 'Mostra password' : 'Nascondi password'"
+              >
+                <mat-icon>{{ hides[2] ? 'visibility_off' : 'visibility' }}</mat-icon>
+              </button>
+              <mat-error *ngIf="formResetPwd.controls['pwdR'].hasError('pattern')">
+                La password deve contenere almeno 6 caratteri, una maiuscola, una minuscola e un carattere speciale.
+              </mat-error>
+              <mat-error *ngIf="formResetPwd.controls['pwdR'].hasError('required')">
+                Campo obbligatorio
+              </mat-error>
+            </mat-form-field>
+
+            <button mat-raised-button color="primary" type="submit">
+              Invia dati
+            </button>
+          </form>
+        </div>
+      </mat-tab>
+
+      @if(actualUser.role === Role.Supervisor) {
+      <mat-tab label="Verifica log altri utenti">
+        <div class="tab-section">
+          🛠️ Qui sarà visualizzata una tabella con i log degli altri utenti.
+        </div>
+      </mat-tab>
+      }
+    </mat-tab-group>
+  </mat-card-content>
+</mat-card>
+

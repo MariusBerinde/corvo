@@ -11,12 +11,12 @@ export class AuthService {
       "email":"t1@gmail.com",
       "username":"usertest1",
       "pwd":"$2b$10$WMF4GdzAxb4tTPILIjGc9uUcSuslGtPdGT8D3LcAmrenpn3bxRZou",
-      "role":1
+      "role":Role.Supervisor
   },{
       "email":"t2@gmail.com",
       "username":"usertest2",
       "pwd":"$2b$10$xe5BgWrwLTUf7j1UYrDm/e.M608PIcaeQRZqJHDQo54ikZrK.hlzy",
-      "role":0
+      "role":Role.Worker
   }
 
   ];
@@ -34,6 +34,7 @@ export class AuthService {
 
     if (!hash) {
       console.warn(`Nessun utente trovato con email ${email}`);
+      console.log(`Nessun utente trovato con email ${email}`);
       return false;
     }
     return this.cmpPlainPwd(pwd,hash);
@@ -65,7 +66,16 @@ export class AuthService {
   getUserName(email:string):string|undefined{
     return this.tmpUsers.find(user=>user.email===email)?.username;
   }
+  setNewPwd(email:string,newPwd:string):boolean{
+    const refUser :User|undefined = this.tmpUsers.find( u=> u.email === email);
+    if(refUser ){
+      refUser.pwd = this.creaHash(newPwd);
+      return true;
+    }
+    else{
+      return false;
+    }
+  }
 
 
-  //TODO:impementare funzioni
 }

@@ -1,0 +1,28 @@
+.toolbar-title {
+  font-size: 20px;
+  font-weight: bold;
+}
+
+.spacer {
+  flex: 1 1 auto;
+}
+
+.user-card {
+  max-width: 800px;
+  margin: 24px auto;
+  padding: 16px;
+}
+
+.user-details {
+  font-size: 16px;
+  line-height: 2;
+}
+
+.tab-section {
+  padding: 16px;
+}
+
+.pwd-form .full-width {
+  width: 100%;
+  margin-bottom: 16px;
+}

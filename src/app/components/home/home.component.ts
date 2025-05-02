@@ -16,7 +16,7 @@ import { ScritturaLocaleService } from '../../services/scrittura-locale.service'
   selector: 'app-home',
   standalone: true,
   templateUrl: './home.component.html',
-  styleUrls: ['./home.component.css'], // ✅ corretto plurale
+  styleUrls: ['./home.component.css'],
   imports: [
     RouterModule,
     MatIconModule,
