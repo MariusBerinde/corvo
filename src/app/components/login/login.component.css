@@ -22,3 +22,20 @@ mat-form-field {
 .mat-mdc-button.mat-primary, .mat-primary { /* Stile per il pulsante primario (potrebbe variare leggermente con le versioni più recenti di Material) */
   /* Puoi aggiungere ulteriori stili qui se necessario */
 }
+
+.custom-header {
+  display: flex;
+  align-items: center;
+  padding: 16px;
+  border-bottom: 1px solid #ddd;
+}
+
+.custom-header button {
+  margin-right: 12px;
+}
+
+.custom-title {
+  margin: 0;
+  font-size: 1.5rem;
+  font-weight: 500;
+}

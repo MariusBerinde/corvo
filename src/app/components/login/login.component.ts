@@ -24,11 +24,15 @@ export class LoginComponent {
   pwdI='';
   nextStep:boolean=false;
   hide = true;
+  errorCredentials=false;
   constructor(private lS:ScritturaLocaleService,private _router: Router,private auth:AuthService){}
   formLogin = new FormGroup({
     email: new FormControl('',[Validators.required, Validators.email]),
     pwd: new FormControl('',[Validators.required ,Validators.pattern(passwordPattern)]),
   });
+  goBack(){
+    this._router.navigate(['']);
+  }
   submitLogin(){
 
     if (this.formLogin.valid) {
@@ -40,12 +44,14 @@ export class LoginComponent {
         this.lS.saveData('email',this.emailI);
         this._router.navigate(['../home/']);
       }else{
+        /*
         let pwd='Manag3r_';
         let hash=this.auth.creaHash("Manag3r_");
         let out="Pwd="+hash;
-
+       */
         //alert("Nome utente o password non validi");
-        alert(out);
+        //alert(out);
+        this.errorCredentials = !this.errorCredentials;
       }
       // Qui puoi inserire la logica per inviare i dati o mostrare un messaggio di successo
     } else {
@@ -53,9 +59,9 @@ export class LoginComponent {
       console.log("Il form non è valido. Errori:", this.formLogin.errors);
 
       this.nextStep = false; // Assicurati che nextStep sia false se ci sono errori
-      // Qui puoi gestire gli errori del form, ad esempio mostrando messaggi all'utente
     }
   }
+
   togglePasswordVisibility() {
     this.hide = !this.hide;
   }

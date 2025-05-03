@@ -1,11 +1,12 @@
 <div class="centered-card-container">
   <mat-card>
-    <mat-card-header>
-      <mat-card-title>Corvo</mat-card-title>
-    </mat-card-header>
+    <div class="custom-header">
+      <button mat-icon-button (click)="goBack()" aria-label="Torna indietro">
+        <mat-icon>arrow_back</mat-icon>
+      </button>
+      <h2 class="custom-title">Corvo</h2>
+    </div>
     <mat-card-content>
-      <span> Login utente locale </span>
-      <br>
 
       <form [formGroup]="formLogin" (submit)="submitLogin()">
         <mat-form-field>
@@ -36,7 +37,7 @@
             <mat-icon>{{ hide ? 'visibility_off' : 'visibility' }}</mat-icon>
           </button>
           @if(formLogin.controls['pwd'].errors?.['pattern']){
-            <mat-error>formato passwor errato : ti ricordo che la passwrod che conterene almeno 6 caratteri e ci devono essere una maiuscola,una pinuscola e un carattere speciale </mat-error>
+            <mat-error>la password deve contenere almeno 6 caratteri comprendenti una maiuscola,una minuscola e un carattere speciale</mat-error>
           }
           @if(formLogin.controls['pwd'].errors?.['required']){
             <mat-error>valore richiesto</mat-error>
@@ -45,8 +46,12 @@
 
         <br>
         <button mat-raised-button color="primary" type="submit">Invia dati</button>
+        @if(errorCredentials){
+        <mat-error>Username o password non validi</mat-error>
+        }
       </form>
       <br>
+
     </mat-card-content>
   </mat-card>
 </div>
