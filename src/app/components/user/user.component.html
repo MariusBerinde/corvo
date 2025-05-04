@@ -101,9 +101,16 @@
               </mat-error>
             </mat-form-field>
 
-            <button mat-raised-button color="primary" type="submit">
-              Invia dati
-            </button>
+            <button mat-raised-button color="primary" type="submit"> Invia dati </button>
+            @if(errorInsertOldPwd){
+              <mat-error>Vecchia password errata</mat-error>
+            }
+            @if(errorPwdR){
+              <mat-error>La password ripetuta non corrisponde</mat-error>
+            }
+            @if(errorReusedOldPwd){
+              <mat-error>Stai riusando la stessa password</mat-error>
+            }
           </form>
         </div>
       </mat-tab>

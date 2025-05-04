@@ -37,7 +37,7 @@
             <mat-icon>{{ hidePwd ? 'visibility_off' : 'visibility' }}</mat-icon>
           </button>
           @if(formRegistrazione.controls['pwd'].errors?.['pattern']){
-          <mat-error>formato passwor errato : ti ricordo che la passwrod che conterene almeno 6 caratteri e ci devono essere una maiuscola,una pinuscola e un carattere speciale </mat-error>
+            <mat-error>la password deve contenere almeno 6 caratteri comprendenti una maiuscola,una minuscola e un carattere speciale</mat-error>
           }
           @if(formRegistrazione.controls['pwd'].errors?.['required']){
           <mat-error>valore richiesto</mat-error>
@@ -59,15 +59,21 @@
             <mat-icon>{{ hidePwdR ? 'visibility_off' : 'visibility' }}</mat-icon>
           </button>
             @if(formRegistrazione.controls['pwdR'].errors?.['pattern']){
-            <mat-error>formato passwor errato : ti ricordo che la passwrod che conterene almeno 6 caratteri e ci devono essere una maiuscola,una pinuscola e un carattere speciale </mat-error>
+            <mat-error>la password deve contenere almeno 6 caratteri comprendenti una maiuscola,una minuscola e un carattere speciale</mat-error>
             }
             @if(formRegistrazione.controls['pwdR'].errors?.['required']){
-            <mat-error>valore richiesto</mat-error>
-
+              <mat-error>valore richiesto</mat-error>
             }
         </mat-form-field>
             <br>
             <button mat-raised-button color="primary" type="submit" >Invia dati </button>
+        @if(errorRePassword){
+         <mat-error>le password inserite non coincidono</mat-error>
+        }
+        @if(errorCreationUser){
+          <mat-error>Utente già presente</mat-error>
+        }
+
           </form>
       <br>
     </mat-card-content>

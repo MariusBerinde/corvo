@@ -18,23 +18,25 @@ import {AuthService } from '../../services/auth.service';
   styleUrl: './registrazione.component.css'
 })
 export class RegistrazioneComponent {
-  emailI='';
-  pwdI='';
-  pwdRI='';
-  hidePwd:boolean=true;
-  hidePwdR:boolean=true;
-  nextStep:boolean=false;
+  emailI = '';
+  errorCreationUser:boolean = false;
+  errorRePassword:boolean = false;
+  hidePwd:boolean = true;
+  hidePwdR:boolean = true;
+  nextStep:boolean = false;
+  pwdI = '';
+  pwdRI = '';
 
 
-togglePwdVisibility(){
-  console.log("togglePwdVisibility");
-  this.hidePwd=!this.hidePwd;
-}
+  togglePwdVisibility(){
+    console.log("togglePwdVisibility");
+    this.hidePwd=!this.hidePwd;
+  }
 
-togglePwdRVisibility(){
-  this.hidePwdR=!this.hidePwdR;
-}
-constructor(private _router: Router,private lS:ScritturaLocaleService,private auth:AuthService) { }
+  togglePwdRVisibility(){
+    this.hidePwdR=!this.hidePwdR;
+  }
+  constructor(private _router: Router,private lS:ScritturaLocaleService,private auth:AuthService) { }
   formRegistrazione = new FormGroup({
     email: new FormControl('',[Validators.required, Validators.email]),
     pwd: new FormControl('',[Validators.required ,Validators.pattern(passwordPattern)]),
@@ -42,36 +44,36 @@ constructor(private _router: Router,private lS:ScritturaLocaleService,private au
 
   });
 
-submitRegistrazione(){
-  if(this.formRegistrazione.valid){
+  submitRegistrazione(){
+    if(this.formRegistrazione.valid){
 
-  this.emailI=this.formRegistrazione.value.email??'null';
-  this.pwdI=this.formRegistrazione.value.pwd??'null';
-  this.pwdRI=this.formRegistrazione.value.pwdR??'null';
-  const pwdUguali=this.pwdI!==this.pwdRI;
+      this.emailI=this.formRegistrazione.value.email??'null';
+      this.pwdI=this.formRegistrazione.value.pwd??'null';
+      this.pwdRI=this.formRegistrazione.value.pwdR??'null';
+      const pwdUguali=this.pwdI===this.pwdRI;
+      this.nextStep=pwdUguali ;
 
-  this.nextStep=pwdUguali ;
+      console.log("valore scritto:",this.emailI);
+      console.log("Provo a navigare verso welcome");
+      if(pwdUguali){
+        let username=this.emailI.substring(0,this.emailI.indexOf('@'));
 
-  console.log("valore scritto:",this.emailI);
-  console.log("Provo a navigare verso welcome");
-  if(this.checkRegistration()){
-    let username=this.emailI.substring(0,this.emailI.indexOf('@'));
+        if(this.auth.createUser(this.emailI,username,this.pwdI)){
+          this.lS.saveData('email',this.emailI);
+          this._router.navigate(['']);
+        }else{
+          this.errorCreationUser = true;
 
-    if(this.auth.createUser(this.emailI,username,this.pwdI)){
-      this.lS.saveData('email',this.emailI);
-      this._router.navigate(['']);
+        }
+      }
+      else{
+        let username=this.emailI.substring(0,this.emailI.indexOf('@'));
+        console.log("test estrazione username:",username);
+        console.log("password non coincidenti");
+        this.errorRePassword = true;
+      }
+
     }
   }
-  else{
-    let username=this.emailI.substring(0,this.emailI.indexOf('@'));
-    console.log("test estrazione username:",username);
-  }
-
-  }
-}
-checkRegistration():boolean{
-  //TODO: implementare condizioni
-  return true;
-}
 
 }

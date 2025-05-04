@@ -45,6 +45,9 @@ export class UserComponent {
   pwdOldI='';
   hide = true;
   hides=[true,true,true];
+  errorInsertOldPwd = false;
+  errorPwdR = false;
+  errorReusedOldPwd = false;
   constructor( private authService: AuthService, private router: Router,
     private storage: ScritturaLocaleService
   ){
@@ -73,30 +76,25 @@ export class UserComponent {
         this.pwdRI = this.formResetPwd.value.pwdR?? '';
         this.pwdOldI = this.formResetPwd.value.pwdOld??'';
         //controllo che sia la vera vecchia oldPwd
-
-            console.log("dentro  submit change pwd");
         if(this.authService.checkUserPwd(this.actualUser.email,this.pwdOldI)){
           console.log("old pwd ok");
           if(this.pwdI===this.pwdRI ){
             if(this.pwdI!=this.pwdOldI){
-
             console.log("cambio pwd ok");
-
-            alert("cambio pwd ok");
             this.authService.setNewPwd(this.actualUser.email,this.pwdI);
             //this.router.navigate(['']);
             this.logout();
             }
             else{
-              alert("vecchia passowrd e nuova corrispondono");
+              this.errorReusedOldPwd = true;
             }
-          }
-          else{
-            alert('pwdI e pwdRI non corrisposndono');
+          } else{
+            this.errorPwdR = true;
           }
         }else{
+         this.errorInsertOldPwd = true;
           var tmp='vecchia pwd errata valore inserito:'+this.pwdOldI
-          alert(tmp);
+          //alert(tmp);
 
         }
 
