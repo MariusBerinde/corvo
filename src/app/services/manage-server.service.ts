@@ -4,7 +4,7 @@ import {Server} from '../interfaces/server';
 @Injectable({
   providedIn: 'root'
 })
-export class GestioneServerService {
+export class ManageServerService {
   protected listaServer:Server[]=[
     {
       "id":"0",

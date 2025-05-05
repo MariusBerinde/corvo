@@ -3,7 +3,7 @@ import { RouterOutlet } from '@angular/router';
 import {LoginComponent } from '../login/login.component';
 import {RegistrazioneComponent} from '../registrazione/registrazione.component';
 import { Router } from '@angular/router';
-import {ScritturaLocaleService} from '../../services/scrittura-locale.service';
+import {LocalWriteService} from '../../services/local-write.service';
 import {MatButtonModule} from '@angular/material/button';
 import {MatCardModule} from '@angular/material/card';
 
@@ -18,7 +18,7 @@ export class WelcomeComponent {
   title = 'corvo';
   valore_letto='default';
 
-constructor(private _router: Router,private lS:ScritturaLocaleService) { }
+constructor(private _router: Router,private lS:LocalWriteService) { }
 navigateToLogin(){
   this._router.navigate(['../login/']);
 }

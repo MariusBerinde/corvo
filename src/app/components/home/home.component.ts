@@ -8,9 +8,9 @@ import { MatMenuModule } from '@angular/material/menu';
 import { MatListModule } from '@angular/material/list';
 
 import { Server } from '../../interfaces/server';
-import { GestioneServerService } from '../../services/gestione-server.service';
+import { ManageServerService } from '../../services/manage-server.service';
 import { AuthService } from '../../services/auth.service';
-import { ScritturaLocaleService } from '../../services/scrittura-locale.service';
+import { LocalWriteService } from '../../services/local-write.service';
 
 @Component({
   selector: 'app-home',
@@ -36,8 +36,8 @@ export class HomeComponent {
   constructor(
     private authService: AuthService,
     private router: Router,
-    private serverService: GestioneServerService,
-    private storage: ScritturaLocaleService
+    private serverService: ManageServerService,
+    private storage: LocalWriteService
   ) {
     this.userName = this.loadUserName();
     this.servers = this.serverService.getAllServers();

@@ -1,10 +1,10 @@
 const passwordPattern = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[\.\,\/\#\!\?\$\%\\\^\&\*\;\:\{\}\=\-\_\(\)\[\]\\\|'&|\`\~@\.])[^]{6,}$/;
 
-import { Component } from '@angular/core';
+import { Component} from '@angular/core';
 import { MatMenuModule } from '@angular/material/menu';
 import { MatToolbarModule } from '@angular/material/toolbar';
 import { Router, RouterModule } from '@angular/router';
-import { ScritturaLocaleService } from '../../services/scrittura-locale.service';
+import { LocalWriteService } from '../../services/local-write.service';
 import {AuthService } from '../../services/auth.service';
 import {FormControl, FormGroup, ReactiveFormsModule,Validators} from '@angular/forms';
 import {MatButtonModule} from '@angular/material/button';
@@ -16,6 +16,7 @@ import {MatInputModule} from '@angular/material/input';
 import {MatTabsModule} from '@angular/material/tabs';
 import {CommonModule } from '@angular/common';
 import {User,Role} from '../../interfaces/user';
+import {TableLogComponent } from '../table-log/table-log.component';
 @Component({
   selector: 'app-user',
   standalone: true,
@@ -31,7 +32,8 @@ import {User,Role} from '../../interfaces/user';
     MatTabsModule,
     MatToolbarModule,
     ReactiveFormsModule,
-    RouterModule
+    RouterModule,
+    TableLogComponent
   ],
   templateUrl: './user.component.html',
   styleUrl: './user.component.css'
@@ -49,7 +51,7 @@ export class UserComponent {
   errorPwdR = false;
   errorReusedOldPwd = false;
   constructor( private authService: AuthService, private router: Router,
-    private storage: ScritturaLocaleService
+    private storage: LocalWriteService
   ){
     const email = this.storage.getData('email') ?? 'default';
     const defaultUser:User={
@@ -102,6 +104,9 @@ export class UserComponent {
 
     }
   logout() {
+
+    this.storage.clearData();
+
       this.router.navigate(['']);
   }
 

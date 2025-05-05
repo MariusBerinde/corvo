@@ -7,7 +7,7 @@ import {MatFormFieldModule} from '@angular/material/form-field';
 import {MatIconModule} from '@angular/material/icon';
 import {MatInputModule} from '@angular/material/input';
 import {Router } from '@angular/router';
-import {ScritturaLocaleService} from '../../services/scrittura-locale.service';
+import {LocalWriteService} from '../../services/local-write.service';
 import {HomeComponent} from '../home/home.component';
 import {AuthService } from '../../services/auth.service';
 import * as bcrypt from 'bcryptjs';
@@ -25,7 +25,7 @@ export class LoginComponent {
   nextStep:boolean=false;
   hide = true;
   errorCredentials=false;
-  constructor(private lS:ScritturaLocaleService,private _router: Router,private auth:AuthService){}
+  constructor(private lS:LocalWriteService,private _router: Router,private auth:AuthService){}
   formLogin = new FormGroup({
     email: new FormControl('',[Validators.required, Validators.email]),
     pwd: new FormControl('',[Validators.required ,Validators.pattern(passwordPattern)]),

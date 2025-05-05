@@ -3,7 +3,7 @@ import { Injectable } from '@angular/core';
 @Injectable({
   providedIn: 'root'
 })
-export class ScritturaLocaleService {
+export class LocalWriteService {
 
   constructor() { }
   public saveData(key:string,value:string):void{

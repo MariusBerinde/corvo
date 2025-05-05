@@ -8,7 +8,7 @@ import {MatFormFieldModule} from '@angular/material/form-field';
 import {MatIconModule} from '@angular/material/icon';
 import {MatInputModule} from '@angular/material/input';
 import {Router } from '@angular/router';
-import {ScritturaLocaleService} from '../../services/scrittura-locale.service';
+import {LocalWriteService} from '../../services/local-write.service';
 import {WelcomeComponent } from '../welcome/welcome.component';
 import {AuthService } from '../../services/auth.service';
 @Component({
@@ -36,7 +36,7 @@ export class RegistrazioneComponent {
   togglePwdRVisibility(){
     this.hidePwdR=!this.hidePwdR;
   }
-  constructor(private _router: Router,private lS:ScritturaLocaleService,private auth:AuthService) { }
+  constructor(private _router: Router,private lS:LocalWriteService,private auth:AuthService) { }
   formRegistrazione = new FormGroup({
     email: new FormControl('',[Validators.required, Validators.email]),
     pwd: new FormControl('',[Validators.required ,Validators.pattern(passwordPattern)]),

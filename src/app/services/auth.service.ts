@@ -66,6 +66,9 @@ export class AuthService {
   getUserName(email:string):string|undefined{
     return this.tmpUsers.find(user=>user.email===email)?.username;
   }
+  getUserRole(email:string):Role|undefined{
+    return this.tmpUsers.find(user=>user.email===email)?.role;
+  }
   setNewPwd(email:string,newPwd:string):boolean{
     const refUser :User|undefined = this.tmpUsers.find( u=> u.email === email);
     if(refUser ){
@@ -76,6 +79,14 @@ export class AuthService {
       return false;
     }
   }
+
+  deleteUser(email:string):boolean{
+    return true;
+    //TODO:
+
+  }
+
+
 
 
 }
