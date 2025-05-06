@@ -35,8 +35,8 @@ export class ManageServiceService {
 
   constructor() { }
   getServiceByIp(ip:string):Service[]{
-    const serverServicies = this.serviceList.find(service=>service.ip===ip);
-    if(serverServicies.length >= 1){
+    const serverServicies = this.serviceList.filter(service=>service.ip===ip);
+    if(serverServicies.length  >= 1){
       return serverServicies;
     }else{
       return [];
@@ -47,7 +47,7 @@ export class ManageServiceService {
   }
   getServiceByName(name:string){
 
-    const serverServicies = this.serviceList.find(service=>service.name===name);
+    const serverServicies = this.serviceList.filter(service=>service.name===name);
     if(serverServicies.length >= 1){
       return serverServicies;
     }else{

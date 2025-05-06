@@ -1,0 +1,22 @@
+
+<table matSort (matSortChange)="sortData($event)">
+  <tr>
+    <th mat-sort-header="name">Nome</th>
+    <th mat-sort-header="desc">Descrizione</th>
+    <th >Stato</th>
+    <th >Avvio automatico</th>
+  </tr>
+  @for(service of serviceList; track service){
+  <tr>
+    <td>{{service.name}}</td>
+    <td>{{service.desc}}</td>
+    <td>{{service.state}}</td>
+    <td>{{service.automaticStart}}</td>
+  </tr>
+  }
+ @empty {
+      <tr><td colspan="4">No data</td></tr>
+    }
+
+</table>
+

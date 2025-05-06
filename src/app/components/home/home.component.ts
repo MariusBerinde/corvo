@@ -11,7 +11,7 @@ import { Server } from '../../interfaces/server';
 import { ManageServerService } from '../../services/manage-server.service';
 import { AuthService } from '../../services/auth.service';
 import { LocalWriteService } from '../../services/local-write.service';
-
+import { TableServicesComponent } from '../table-services/table-services.component';
 @Component({
   selector: 'app-home',
   standalone: true,
@@ -24,7 +24,8 @@ import { LocalWriteService } from '../../services/local-write.service';
     MatCardModule,
     MatToolbarModule,
     MatMenuModule,
-    MatListModule
+    MatListModule,
+    TableServicesComponent
   ],
   changeDetection: ChangeDetectionStrategy.OnPush,
 })

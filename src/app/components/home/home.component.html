@@ -34,23 +34,10 @@
               <mat-panel-title>IP: </mat-panel-title>
               <mat-panel-description >{{ val.ip }}</mat-panel-description>
             </mat-expansion-panel-header>
-
             <div class="server-details">
-              <span>Ci dovrebbero essere i servizi ma per il momento metto i dati del server</span>
-              <br>
-              <span>ID: {{ val.id }}</span>
-              <br>
-              <span>Stato: {{ val.state ? 'Online' : 'Offline' }}</span>
-              <br>
-              @if (val.name) {
-              <span>Nome: {{ val.name }}</span>
-              <br>
-              }
-              @if (val.descr) {
-              <span>Descr: {{ val.descr }}</span>
-              <br>
-              }
+            <table-services [ip]="val.ip"></table-services>
             </div>
+
           </mat-expansion-panel>
         </mat-accordion>
         }
