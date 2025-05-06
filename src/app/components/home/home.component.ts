@@ -6,6 +6,7 @@ import { MatCardModule } from '@angular/material/card';
 import { MatToolbarModule } from '@angular/material/toolbar';
 import { MatMenuModule } from '@angular/material/menu';
 import { MatListModule } from '@angular/material/list';
+import {MatButtonModule} from '@angular/material/button';
 
 import { Server } from '../../interfaces/server';
 import { ManageServerService } from '../../services/manage-server.service';
@@ -21,6 +22,7 @@ import { TableServicesComponent } from '../table-services/table-services.compone
     RouterModule,
     MatIconModule,
     MatExpansionModule,
+    MatButtonModule,
     MatCardModule,
     MatToolbarModule,
     MatMenuModule,
@@ -64,5 +66,8 @@ export class HomeComponent {
   logout() {
       this.router.navigate(['']);
   }
+ dettagliServer(ip:string){
+      this.router.navigate(['detail-server',ip]);
+ }
 
 }

@@ -1,5 +1,4 @@
 import { Injectable } from '@angular/core';
-import { ManageServiceService } from '../services/manage-server.service';
 import { Rule } from '../interfaces/rule';
 import { Service } from '../interfaces/service';
 
@@ -91,7 +90,7 @@ private listaRegole:Rule[]=[
   }];
   constructor() { }
   getRulesByIp(ip:string):Rule[]{
-    const rules = listaRegole.find(rule=>rule.ip===ip && rule.status);
+    const rules = this.listaRegole.filter(rule=>rule.ip===ip && rule.status);
     if (rules.length >= 1) {
       return rules;
     }else{

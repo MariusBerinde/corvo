@@ -4,6 +4,7 @@ import {LoginComponent } from './components/login/login.component';
 import {RegistrazioneComponent} from './components/registrazione/registrazione.component';
 import {WelcomeComponent } from './components/welcome/welcome.component';
 import {UserComponent} from './components/user/user.component';
+import {DetailServerComponent} from './components/detail-server/detail-server.component';
 export const routes: Routes = [
   {
     path:'home',
@@ -29,6 +30,10 @@ export const routes: Routes = [
     path:'user',
     component:UserComponent,
     title:'User'
+  },
+  {
+    path:'detail-server/:ip',
+    component: DetailServerComponent,
   }
 
   ];

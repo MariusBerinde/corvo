@@ -38,4 +38,17 @@ export class ManageServerService {
   public getAllServers():Server[]{
     return this.listaServer;
   }
+  public getServerByIp(ip:string):Server{
+    const ris=this.listaServer.find(s=>s.ip===ip);
+    if(ris == undefined)
+      return {
+      "id":"",
+      "ip":"",
+      "state":false,
+      "name":"",
+      "descr":""
+      };
+
+    return ris;
+  }
 }

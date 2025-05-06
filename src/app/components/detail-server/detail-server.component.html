@@ -1,0 +1,88 @@
+<mat-toolbar color="primary">
+  <span class="toolbar-title">🦅 Corvo</span>
+  <span class="spacer"></span>
+  <button mat-icon-button [matMenuTriggerFor]="userMenu">
+    <mat-icon>account_circle</mat-icon>
+  </button>
+  <mat-menu #userMenu="matMenu">
+    <button mat-menu-item [routerLink]="['/home']">
+      <mat-icon>home</mat-icon>
+      <span>Home</span>
+    </button>
+    <button mat-menu-item (click)="logout()">
+      <mat-icon>logout</mat-icon>
+      <span>Logout</span>
+    </button>
+  </mat-menu>
+</mat-toolbar>
+
+<mat-card>
+  <mat-card-header>
+    <mat-card-title> Dettagli server</mat-card-title>
+
+  </mat-card-header>
+
+  <mat-card-content>
+    <mat-list>
+      <mat-list-item>
+        <span matListItemTitle>Dettagli server</span>
+        <span  matListItemLine>Ip:{{localServer.ip}}</span>
+        <span matListItemLine>Nome:{{localServer.name}}</span>
+        <span matListItemLine>Descrizione:{{localServer.descr}}</span>
+        <span matListItemLine>Stato:@if(localServer.state){up}@else{down} </span>
+      </mat-list-item>
+    </mat-list>
+
+    <br>
+
+<H2>Regole attive</H2>
+    @if(activeRulesList.length>0){
+
+    <mat-list>
+      @if(generalRules.length>0){
+      <mat-list-item>
+        <span matListItemTitle>Regole generali</span>
+      @for(val of generalRules; track val.id) {
+        <span matListItemLine>Descrizione:{{val.descr}}</span>
+      }
+      </mat-list-item>
+      }
+
+      @if(rulesDB.length>0){
+
+      <mat-list-item>
+        <span matListItemTitle>Regole Database</span>
+        @for(val of rulesDB; track val.id) {
+        <span matListItemLine>Descrizione:{{val.descr}}</span>
+        }
+      </mat-list-item>
+      }
+
+      @if(rulesDocker.length>0){
+
+      <mat-list-item>
+        <span matListItemTitle>Regole Docker</span>
+        @for(val of rulesDocker; track val.id) {
+        <span matListItemLine>Descrizione:{{val.descr}}</span>
+        }
+      </mat-list-item>
+      }
+
+      @if(rulesHa.length>0){
+
+      <mat-list-item>
+        <span matListItemTitle>Regole Ha</span>
+        @for(val of rulesHa; track val.id) {
+        <span matListItemLine>Descrizione:{{val.descr}}</span>
+        }
+      </mat-list-item>
+      }
+    </mat-list>
+    }@else{
+    <span> Non ci sono regole attive</span>
+    }
+    <button mat-menu-item>Scansione Lynis</button>
+
+
+  </mat-card-content>
+</mat-card>

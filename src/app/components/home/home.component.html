@@ -24,7 +24,6 @@
 
 
 
-    <-!-TODO:da inserire mat-nav-list dopo aver creato dettagli server->
       <mat-list>
         @for(val of servers; track val.id) {
         <mat-accordion>
@@ -36,6 +35,9 @@
             </mat-expansion-panel-header>
             <div class="server-details">
             <table-services [ip]="val.ip"></table-services>
+          <button mat-raised-button (click)="dettagliServer(val.ip)"> Dettagli </button>
+
+
             </div>
 
           </mat-expansion-panel>
