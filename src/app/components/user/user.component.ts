@@ -17,6 +17,7 @@ import {MatTabsModule} from '@angular/material/tabs';
 import {CommonModule } from '@angular/common';
 import {User,Role} from '../../interfaces/user';
 import {TableLogComponent } from '../table-log/table-log.component';
+import { ManageLogService } from '../../services/manage-log.service';
 @Component({
   selector: 'app-user',
   standalone: true,
@@ -50,8 +51,11 @@ export class UserComponent {
   errorInsertOldPwd = false;
   errorPwdR = false;
   errorReusedOldPwd = false;
-  constructor( private authService: AuthService, private router: Router,
-    private storage: LocalWriteService
+  constructor(
+              private authService: AuthService,
+              private router: Router,
+              private storage: LocalWriteService,
+              private log:ManageLogService
   ){
     const email = this.storage.getData('email') ?? 'default';
     const defaultUser:User={
@@ -73,6 +77,7 @@ export class UserComponent {
   });
 
     submitChangePwd(){
+      this.log.setLog(this.actualUser.username,"cambiamento password");
       if(this.formResetPwd.valid){
         this.pwdI = this.formResetPwd.value.pwd??'';
         this.pwdRI = this.formResetPwd.value.pwdR?? '';

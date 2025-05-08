@@ -1,0 +1,57 @@
+
+<mat-toolbar>
+  <span>Corvo</span>
+  <span class="spacer"></span>
+  <button mat-icon-button [matMenuTriggerFor]="userMenu">
+    <mat-icon>account_circle</mat-icon>
+  </button>
+  <mat-menu #userMenu="matMenu">
+    <button mat-menu-item [routerLink]="['/user']">
+      <span>{{ userName }}</span>
+    </button>
+    <button mat-menu-item (click)="logout()">
+      <mat-icon>logout</mat-icon>
+      <span>Logout</span>
+    </button>
+  </mat-menu>
+</mat-toolbar>
+<mat-card>
+  <mat-card-content>
+
+<mat-accordion>
+  <mat-expansion-panel hideToggle>
+    <mat-expansion-panel-header>
+      <mat-panel-title>  Riepilogo informazioni</mat-panel-title>
+    </mat-expansion-panel-header>
+        <p>Ip attulale {{ip}} </p>
+  </mat-expansion-panel>
+</mat-accordion>
+<br>
+
+<mat-accordion>
+  <mat-expansion-panel hideToggle>
+    <mat-expansion-panel-header>
+      <mat-panel-title> Regole disabilitate</mat-panel-title>
+    </mat-expansion-panel-header>
+        @if(acutalConfig.listIdSkippedTest.length>0){
+
+        }
+        @else{
+        <span>Non ci sono regole disabilite</span>
+        }
+        <span>Test stato config attuale {{acutalConfig.auditor}},{{acutalConfig.listIdSkippedTest.length}}</span>
+        <br>
+        @if(descTest.length>0){
+        <span>Test lettura elementi skippabili numero di elementi={{descTest.length}}</span>
+        <br>
+        <span>Primo elemento {{descTest[0].id}},{{descTest[0].os}},{{descTest[0].desc}}</span>
+        }
+    <p>This is the primary content of the panel.</p>
+        <button>Lancia scansione</button>
+        <br>
+        <button mat-button (click)="testDialog()">Aggiungi regola da disabilitare</button>
+
+  </mat-expansion-panel>
+</mat-accordion>
+  </mat-card-content>
+</mat-card>

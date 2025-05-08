@@ -5,6 +5,8 @@ import {RegistrazioneComponent} from './components/registrazione/registrazione.c
 import {WelcomeComponent } from './components/welcome/welcome.component';
 import {UserComponent} from './components/user/user.component';
 import {DetailServerComponent} from './components/detail-server/detail-server.component';
+import { LynisComponent } from './components/lynis/lynis.component';
+
 export const routes: Routes = [
   {
     path:'home',
@@ -34,6 +36,11 @@ export const routes: Routes = [
   {
     path:'detail-server/:ip',
     component: DetailServerComponent,
+  },
+  {
+    path:'lynis/:ip',
+    component:LynisComponent
   }
+
 
   ];

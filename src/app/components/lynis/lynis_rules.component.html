@@ -1,0 +1,16 @@
+<h2 mat-dialog-title>Scegli regola da inserire</h2>
+
+<mat-dialog-actions>
+  <p>lunghezza mini{{data.mini.length}}</p>
+  <mat-selection-list #rules>
+    @for(rule of data.mini; track rule){
+    <mat-list-option>{{rule.desc}}</mat-list-option>
+    }
+  </mat-selection-list>
+
+  <p>{{rules.selectedOptions.selected.length}}</p>
+
+  <button mat-button (click)="rules.selectedOptions.clear()">clear</button>
+  <br>
+  <button mat-button mat-dialog-close>Close</button>
+</mat-dialog-actions>
