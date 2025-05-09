@@ -1,4 +1,4 @@
-import { Component,OnInit,ChangeDetectionStrategy,signal,inject } from '@angular/core';
+import { Component,OnInit,ChangeDetectionStrategy,signal,inject, ChangeDetectorRef } from '@angular/core';
 import { MatMenuModule } from '@angular/material/menu';
 import { MatToolbarModule } from '@angular/material/toolbar';
 import { MatIconModule } from '@angular/material/icon';
@@ -9,18 +9,21 @@ import { ManageLynisService } from '../../services/manage-lynis.service';
 import { LocalWriteService } from '../../services/local-write.service';
 import { ManageLogService } from '../../services/manage-log.service';
 import { AuthService } from '../../services/auth.service';
-import {MatListModule} from '@angular/material/list';
+import {MatListModule, MatSelectionList, MatListOption} from '@angular/material/list';
 import {
   MatDialog,
   MatDialogActions,
   MatDialogClose,
   MatDialogContent,
   MatDialogTitle,
-  MAT_DIALOG_DATA
+  MAT_DIALOG_DATA,
+  MatDialogRef
 } from '@angular/material/dialog';
 
 import { LynisTest,Lynis } from '../../interfaces/lynis';
 import {MatExpansionModule} from '@angular/material/expansion';
+import { LynisRulesComponent } from './lynis-rules/lynis-rules.component';
+import { firstValueFrom } from 'rxjs';
 @Component({
   selector: 'app-lynis',
   imports: [
@@ -43,12 +46,9 @@ export class LynisComponent implements OnInit{
   acutalConfig:Lynis={ auditor:"", listIdSkippedTest:[] };
   descTest:LynisTest[]=[];
   mini:LynisTest[]=[];
-
+  risDialog:string[]=[];
   ip:string = '';
   dialog = inject(MatDialog);
-
-
-
 
   constructor(
     private router: Router,
@@ -56,14 +56,15 @@ export class LynisComponent implements OnInit{
     private log: ManageLogService,
     private authService:AuthService,
     private lynis:ManageLynisService,
-    private inRoute:ActivatedRoute
+    private inRoute:ActivatedRoute,
+    private cdr: ChangeDetectorRef
   ) { }
 
   ngOnInit():void{
     this.userName = this.loadUserName();
     this.acutalConfig=this.lynis.getActualConfig();
     this.descTest = this.lynis.getSkippableTestList();
-    this.mini = this.descTest.slice(0,5);
+    this.mini = this.descTest.slice(0,20);
     this.ip = this.inRoute.snapshot.paramMap.get('ip')??'errore navigazione';
   }
   loadUserName(): string {
@@ -85,36 +86,32 @@ export class LynisComponent implements OnInit{
   logout() {
       this.router.navigate(['']);
   }
- testDialog(){
-    this.dialog.open(DialogSelectorRules ,{
-     data:{
-       ip:this.ip,
-       acutalConfig : this.acutalConfig,
-       mini:this.mini
-       //mini:this.descTest
+testDialog() {
+    console.log("valore di mini0=", this.mini[0]?.id);
+    const dialogRef = this.dialog.open(LynisRulesComponent, {
+      maxWidth: '90vw',
+      maxHeight: '90vh',
+      width: 'auto',
+      height: 'auto',
+      data: {
+        ip: this.ip,
+        acutalConfig: this.acutalConfig,
+        mini: this.mini
+      },
+    });
 
-     }, });
-
- }
-
-
-}
-
-@Component({
-
-  selector:'app-dialog-selector',
-  imports: [
-    MatDialogTitle,
-    MatDialogContent,
-    MatDialogActions,
-    MatDialogClose,
-    MatButtonModule,
-    MatListModule
-  ],
-  templateUrl: './lynis_rules.component.html',
-  styleUrl: './lynis.component.css',
-})
-export class DialogSelectorRules{
-  data = inject(MAT_DIALOG_DATA);
+    dialogRef.afterClosed().subscribe(ris => {
+      console.log("Dialog chiuso");
+      if (ris !== undefined && ris.length > 0) {
+        this.acutalConfig.listIdSkippedTest = ris;
+        console.log("Elementi ricevuti dal dialog:", ris);
+        console.log("listIdSkippedTest aggiornato:", this.acutalConfig.listIdSkippedTest);
+        this.cdr.detectChanges(); // Forza l'aggiornamento della vista
+      } else {
+        console.log("Nessun elemento selezionato o dialog annullato.");
+      }
+    });
+    console.log("Valore di listIdSkippedTest dopo subscribe (prima della chiusura del dialog):", this.acutalConfig.listIdSkippedTest);
+  }
 }
 

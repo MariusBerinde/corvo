@@ -2,18 +2,29 @@
 
 <mat-dialog-actions>
   <p>lunghezza mini{{data.mini.length}}</p>
-  <mat-selection-list #rules>
+  <div class="scrollable-list-container">
+
+  <mat-selection-list #rules class="scrollable-list" >
     @for(rule of data.mini; track rule){
     <mat-list-option [value]="rule.id">{{rule.id}}-{{rule.desc}}</mat-list-option>
     }
   </mat-selection-list>
 
-  <p>{{rules.selectedOptions.selected.length}}</p>
+  </div>
 
+  <button mat-button (click)="save(rules)">Salva</button>
+  <br>
+  @if(selectedRules.length>0){
+  <mat-list>
+    @for(element of selectedRules;track element) {
+      <mat-list-item>{{element}}</mat-list-item>
+    }
+  </mat-list>
+  }@else{
+  <span>lista degli elementi selezionati vuota</span>
+  }
 
   <button mat-button (click)="rules.selectedOptions.clear()">clear</button>
-  <br>
-  <button mat-button (click)="save(rules)">Salva</button>
   <br>
   <button mat-button mat-dialog-close>Close</button>
 </mat-dialog-actions>

@@ -34,11 +34,17 @@
       <mat-panel-title> Regole disabilitate</mat-panel-title>
     </mat-expansion-panel-header>
         @if(acutalConfig.listIdSkippedTest.length>0){
+        <mat-list>
+          @for(el of acutalConfig.listIdSkippedTest;track el){
+          <mat-list-item>{{el}}</mat-list-item>
+          }
+        </mat-list>
 
         }
         @else{
         <span>Non ci sono regole disabilite</span>
         }
+        <br>
         <span>Test stato config attuale {{acutalConfig.auditor}},{{acutalConfig.listIdSkippedTest.length}}</span>
         <br>
         @if(descTest.length>0){
@@ -50,7 +56,6 @@
         <button>Lancia scansione</button>
         <br>
         <button mat-button (click)="testDialog()">Aggiungi regola da disabilitare</button>
-
   </mat-expansion-panel>
 </mat-accordion>
   </mat-card-content>
