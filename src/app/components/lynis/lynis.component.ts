@@ -1,4 +1,5 @@
-import { Component,OnInit,ChangeDetectionStrategy,signal,inject, ChangeDetectorRef } from '@angular/core';
+//import { Component,OnInit,ChangeDetectionStrategy,signal,inject, ChangeDetectorRef } from '@angular/core';
+import { Component,OnInit,ChangeDetectionStrategy,inject, ChangeDetectorRef } from '@angular/core';
 import { MatMenuModule } from '@angular/material/menu';
 import { MatToolbarModule } from '@angular/material/toolbar';
 import { MatIconModule } from '@angular/material/icon';
@@ -9,21 +10,15 @@ import { ManageLynisService } from '../../services/manage-lynis.service';
 import { LocalWriteService } from '../../services/local-write.service';
 import { ManageLogService } from '../../services/manage-log.service';
 import { AuthService } from '../../services/auth.service';
-import {MatListModule, MatSelectionList, MatListOption} from '@angular/material/list';
+import {MatListModule, } from '@angular/material/list';
+//import {MatListModule, MatSelectionList, MatListOption} from '@angular/material/list';
 import {
-  MatDialog,
-  MatDialogActions,
-  MatDialogClose,
-  MatDialogContent,
-  MatDialogTitle,
-  MAT_DIALOG_DATA,
-  MatDialogRef
-} from '@angular/material/dialog';
+  MatDialog, } from '@angular/material/dialog';
 
 import { LynisTest,Lynis } from '../../interfaces/lynis';
 import {MatExpansionModule} from '@angular/material/expansion';
 import { LynisRulesComponent } from './lynis-rules/lynis-rules.component';
-import { firstValueFrom } from 'rxjs';
+//import { firstValueFrom } from 'rxjs';
 @Component({
   selector: 'app-lynis',
   imports: [
@@ -112,6 +107,11 @@ testDialog() {
       }
     });
     console.log("Valore di listIdSkippedTest dopo subscribe (prima della chiusura del dialog):", this.acutalConfig.listIdSkippedTest);
+  }
+
+
+  navigateToHome(){
+    this.router.navigate(['home']);
   }
 }
 

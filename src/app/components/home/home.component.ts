@@ -70,4 +70,5 @@ export class HomeComponent {
       this.router.navigate(['detail-server',ip]);
  }
 
+
 }

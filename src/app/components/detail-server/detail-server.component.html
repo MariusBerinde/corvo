@@ -1,5 +1,9 @@
 <mat-toolbar color="primary">
+  <button (click)="navigateToHome()" >
+
   <span class="toolbar-title">🦅 Corvo</span>
+  </button>
+
   <span class="spacer"></span>
   <button mat-icon-button [matMenuTriggerFor]="userMenu">
     <mat-icon>account_circle</mat-icon>
@@ -21,6 +25,7 @@
     <mat-card-title> Dettagli server</mat-card-title>
 
   </mat-card-header>
+
 
   <mat-card-content>
     <mat-list>

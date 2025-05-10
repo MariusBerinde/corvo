@@ -120,6 +120,10 @@ export class UserComponent {
     this.hides[index]= ! this.hides[index];
   }
 
+  navigateToHome(){
+    this.router.navigate(['home']);
+  }
+
 }
 
 

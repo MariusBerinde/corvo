@@ -36,7 +36,10 @@ export class RegistrazioneComponent {
   togglePwdRVisibility(){
     this.hidePwdR=!this.hidePwdR;
   }
-  constructor(private _router: Router,private lS:LocalWriteService,private auth:AuthService) { }
+  constructor(private _router: Router,
+    private lS:LocalWriteService,
+    private auth:AuthService,
+  ) { }
   formRegistrazione = new FormGroup({
     email: new FormControl('',[Validators.required, Validators.email]),
     pwd: new FormControl('',[Validators.required ,Validators.pattern(passwordPattern)]),
@@ -74,6 +77,11 @@ export class RegistrazioneComponent {
       }
 
     }
+  }
+
+
+  navigateToHome(){
+    this._router.navigate(['']);
   }
 
 }

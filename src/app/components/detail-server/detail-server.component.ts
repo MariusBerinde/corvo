@@ -15,6 +15,7 @@ import { LocalWriteService } from '../../services/local-write.service';
 import { ManageServerService } from '../../services/manage-server.service';
 import { ManageLogService } from '../../services/manage-log.service';
 import { Server } from '../../interfaces/server';
+import { HomeComponent } from '../home/home.component';
 @Component({
   selector: 'app-detail-server',
   imports: [
@@ -92,5 +93,8 @@ logout() {
   }
   navigateToLynis(){
     this.router.navigate(['lynis',this.ip]);
+  }
+  navigateToHome(){
+    this.router.navigate(['home']);
   }
 }

@@ -90,7 +90,7 @@ private listaRegole:Rule[]=[
   }];
   constructor() { }
   getRulesByIp(ip:string):Rule[]{
-    const rules = this.listaRegole.filter(rule=>rule.ip===ip && rule.status);
+    const rules = this.listaRegole.filter(rule=>rule.ip===ip );
     if (rules.length >= 1) {
       return rules;
     }else{
