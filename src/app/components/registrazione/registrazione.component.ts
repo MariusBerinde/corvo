@@ -24,6 +24,7 @@ export class RegistrazioneComponent {
   hidePwd:boolean = true;
   hidePwdR:boolean = true;
   nextStep:boolean = false;
+  preApprovedEmail:boolean = false;
   pwdI = '';
   pwdRI = '';
 
@@ -33,9 +34,8 @@ export class RegistrazioneComponent {
     this.hidePwd=!this.hidePwd;
   }
 
-  togglePwdRVisibility(){
-    this.hidePwdR=!this.hidePwdR;
-  }
+  togglePwdRVisibility(){ this.hidePwdR=!this.hidePwdR; }
+
   constructor(private _router: Router,
     private lS:LocalWriteService,
     private auth:AuthService,
@@ -54,28 +54,29 @@ export class RegistrazioneComponent {
       this.pwdI=this.formRegistrazione.value.pwd??'null';
       this.pwdRI=this.formRegistrazione.value.pwdR??'null';
       const pwdUguali=this.pwdI===this.pwdRI;
-      this.nextStep=pwdUguali ;
+      this.preApprovedEmail = this.auth.isEmailApproved(this.emailI);
 
       console.log("valore scritto:",this.emailI);
       console.log("Provo a navigare verso welcome");
-      if(pwdUguali){
-        let username=this.emailI.substring(0,this.emailI.indexOf('@'));
+      if(this.preApprovedEmail){
 
-        if(this.auth.createUser(this.emailI,username,this.pwdI)){
-          this.lS.saveData('email',this.emailI);
-          this._router.navigate(['']);
-        }else{
-          this.errorCreationUser = true;
+        if(pwdUguali){
+          let username=this.emailI.substring(0,this.emailI.indexOf('@'));
 
+          if(this.auth.createUser(this.emailI,username,this.pwdI)){
+            this.lS.saveData('email',this.emailI);
+            this._router.navigate(['']);
+          }else{
+            this.errorCreationUser = true;
+          }
+        }
+        else{
+          let username=this.emailI.substring(0,this.emailI.indexOf('@'));
+          console.log("test estrazione username:",username);
+          console.log("password non coincidenti");
+          this.errorRePassword = true;
         }
       }
-      else{
-        let username=this.emailI.substring(0,this.emailI.indexOf('@'));
-        console.log("test estrazione username:",username);
-        console.log("password non coincidenti");
-        this.errorRePassword = true;
-      }
-
     }
   }
 

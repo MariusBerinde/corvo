@@ -1,5 +1,5 @@
 import { Component, inject } from '@angular/core';
-import { MatDialogRef, MatDialogTitle, MatDialogContent, MatDialogActions, MatDialogClose, MAT_DIALOG_DATA } from '@angular/material/dialog';
+import { MatDialogRef, MatDialogTitle,  MatDialogActions, MatDialogClose, MAT_DIALOG_DATA } from '@angular/material/dialog';
 import { MatButtonModule } from '@angular/material/button';
 import { MatListModule, MatSelectionList, MatListOption } from '@angular/material/list';
 
@@ -8,7 +8,6 @@ import { MatListModule, MatSelectionList, MatListOption } from '@angular/materia
   standalone: true,
   imports: [
     MatDialogTitle,
-    MatDialogContent,
     MatDialogActions,
     MatDialogClose,
     MatButtonModule,

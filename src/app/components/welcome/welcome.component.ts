@@ -24,7 +24,6 @@ navigateToLogin(){
 }
 navigateToReg(){
   this._router.navigate(['../registrazione/']);
-
 }
 
 leggi(){
@@ -33,5 +32,4 @@ leggi(){
   console.log("valore letto",sup);
 }
 
-//TODO: inserire controllo pulsante login
 }

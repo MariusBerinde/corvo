@@ -137,22 +137,40 @@ export class ManageLynisService {
     "listIdSkippedTest":[]
   };
   constructor() { }
+/**
+ * Retrieves the list of Lynis tests that can be skipped.
+ * @returns An array of skippable LynisTest objects.
+ */
   getSkippableTestList():LynisTest[]{
     return this.skippableTestList;
   }
+/**
+ * Sets the auditor name in the current Lynis configuration.
+ * @param user - The name of the auditor to assign.
+ */
   setAuditor(user:string){
     this.actualConif.auditor=user;
   }
+/**
+ * Replaces the current Lynis configuration with the provided one.
+ * @param config - The new Lynis configuration object.
+ */
   setConfig(config:Lynis){
     this.actualConif=config;
   }
+/**
+ * Returns the current Lynis configuration in use.
+ * @returns The current Lynis configuration object.
+ */
   getActualConfig():Lynis{
     return this.actualConif;
   }
+/**
+ * Retrieves the list of IDs of the tests that have been skipped in the current configuration.
+ * @returns An array of test ID strings that were skipped.
+ */
   getSkippedTests():string[]{
     return this.actualConif.listIdSkippedTest;
   }
-
-
 
 }

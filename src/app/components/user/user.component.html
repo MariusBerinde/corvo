@@ -38,7 +38,7 @@
     <mat-tab-group>
       <mat-tab label="Riepilogo operazioni">
         <div class="tab-section">
-          <table-log></table-log>
+          <table-log [allData]="false" ></table-log>
         </div>
       </mat-tab>
 
@@ -120,7 +120,13 @@
       @if(actualUser.role === Role.Supervisor) {
       <mat-tab label="Verifica log altri utenti">
         <div class="tab-section">
-          🛠️ Qui sarà visualizzata una tabella con i log degli altri utenti.
+          <table-log [allData]="true" ></table-log>
+        </div>
+      </mat-tab>
+
+      <mat-tab label="Gestisci utenti">
+        <div class="tab-section">
+          Gestione utenti
         </div>
       </mat-tab>
       }

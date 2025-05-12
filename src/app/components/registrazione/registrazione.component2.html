@@ -67,13 +67,17 @@
         </mat-form-field>
             <br>
             <button mat-raised-button color="primary" type="submit" >Invia dati </button>
-        @if(errorRePassword){
-         <mat-error>le password inserite non coincidono</mat-error>
-        }
-        @if(errorCreationUser){
-          <mat-error>Utente già presente</mat-error>
-        }
 
+        @if(!preApprovedEmail){
+          <mat-error>email non valida per la registrazione,contattare un supervisore per ottenere la per approvazione</mat-error>
+        }@else{
+          @if(errorRePassword){
+            <mat-error>le password inserite non coincidono</mat-error>
+          }
+          @if(errorCreationUser){
+            <mat-error>Utente già presente</mat-error>
+          }
+        }
           </form>
       <br>
     </mat-card-content>

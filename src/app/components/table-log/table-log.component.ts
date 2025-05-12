@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit,Input } from '@angular/core';
 import { Log } from '../../interfaces/log';
 import { ManageLogService } from '../../services/manage-log.service';
 import { Role } from '../../interfaces/user';
@@ -16,6 +16,7 @@ import { Sort, MatSortModule } from '@angular/material/sort';
 export class TableLogComponent implements OnInit {
   sortedLogs: Log[] = [];
   localMail:string='';
+  @Input() allData:boolean = false;
 
   constructor(
     private gL: ManageLogService,
@@ -28,7 +29,12 @@ export class TableLogComponent implements OnInit {
     this.localMail=email;
     if(email.length>0){
       const role = this.auth.getUserRole(email);
-      this.sortedLogs=(role===Role.Worker)?(this.gL.getUserLog(email)):(this.gL.getAllLogs());
+      if(this.allData)
+      console.log("devo caricare tutto")
+        else
+        console.log("devo caricare solo i miei")
+
+      this.sortedLogs=(this.allData && role===Role.Supervisor)?(this.gL.getAllLogs()):(this.gL.getUserLog(email));
 
     }
   }

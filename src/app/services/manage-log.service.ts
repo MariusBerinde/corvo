@@ -78,18 +78,22 @@ export class ManageLogService {
   }
   ];
   constructor() { }
+  /* Returns all the log from the database
+   */
   getAllLogs():Log[]{
     return this.listaLog;
   }
 
-  /**
-  * returns the log of user with email
-  * @ param email - the email of the user
-  */
+/**
+ * Returns all logs associated with a user given their email address.
+ * @param email - The email address of the user
+ * @returns An array of Log objects associated with the user (may be empty)
+ */
 getUserLog(email: string): Log[] {
   console.log("email ricevuta =",email);
   const userLogs = this.listaLog.filter(log => log.user === email);
 
+    /*
   if (userLogs.length > 1) {
     return userLogs; // Restituisce il vettore completo se ci sono più log
   } else if (userLogs.length === 1) {
@@ -97,14 +101,22 @@ getUserLog(email: string): Log[] {
   } else {
     return []; // Restituisce il vettore vuoto se non trova log per l'email
   }
+  */
+  if(userLogs.length>=1){
+      return userLogs;
+    }
+    else{
+      return [];
+    }
+
 }
 
   /**
   * create a log with user,descr,server,service as params
   * @ param string - the email of the user
   * @ descr string - a string that describe the event
-  * @ server string - the ip of the server where the event is logged
-  * @ service string - the name of servcice where the event is logged
+  * @ server string - the IP of the server where the event is logged
+  * @ service string - the name of service where the event is logged
   */
   setLog(user:string,descr:string,server?:string,service?:string){
     const value = Date.now();
@@ -123,7 +135,5 @@ getUserLog(email: string): Log[] {
 
    this.listaLog.push(actualLog);
   }
-
-
 
 }
