@@ -193,6 +193,61 @@ export class AuthService {
     const index=this.approvedUsers.indexOf(email);
     return (index>=0 && index<=this.approvedUsers.length)
   }
+ /**
+   * Retrieves the list of currently approved users.
+   *
+   * @returns An array of strings, where each string is the identifier
+   * (e.g., username, user ID) of an approved user. Returns an empty
+   * array if no users are currently approved.
+   */
+  getApprovedUsers():string[]{
+  return this.approvedUsers;
+  }
+/**
+ * Removes the specified email from the list of approved users.
+ * Logs the action and returns whether the removal was successful.
+ *
+ * @param email - The email address to remove from the approved list.
+ * @returns True if the email was successfully removed; false if it was not found.
+ */
+  removeApprovedUser(email:string):boolean{
+    const iEmail = this.approvedUsers.findIndex(e=>e===email);
+    if( iEmail<0 ){
+      this.log.setLog(this.actualUsername,`Tentato di cancellare pre-approvazione  per email ${email}`);
+      return false;
+    }
+      this.log.setLog(this.actualUsername,`Cancellata pre-approvazione  per email ${email}`);
+    this.approvedUsers.splice(iEmail,1);
+    return true;
+  }
+/**
+ * Updates the role of a user identified by their email address.
+ *
+ * Logs the role change action and updates the user's role if the user exists.
+ *
+ * @param email - The email address of the user whose role is to be updated.
+ * @param newRole - The new role to assign to the user (e.g., Supervisor or Worker).
+ * @returns true if the role was successfully updated; false if no user was found with the given email.
+ */
+  setNewRole(email:string,newRole:Role):boolean{
+    this.log.setLog(this.actualUsername,`Aggiorna nuovo ruolo ${newRole} per l'utente con mail ${email}`);
+    const refUser :User|undefined = this.tmpUsers.find( u=> u.email === email);
+    if(refUser ){
+      refUser.role = newRole;
+      return true;
+    }
+    else{
+      return false;
+    }
+
+  }
+
+getAllUsersInfo(): Omit<User, 'pwd'>[] {
+    return this.tmpUsers.map(user => {
+      const { pwd, ...userWithoutPwd } = user;
+      return userWithoutPwd;
+    });
+  }
 
 
 }

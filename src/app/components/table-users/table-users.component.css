@@ -1,0 +1,41 @@
+.user-roles-table {
+  width: 100%;
+  table-layout: auto;
+
+  th.mat-header-cell,
+  td.mat-cell {
+    text-align: center;
+    padding: 12px;
+    vertical-align: middle;
+    white-space: nowrap;
+  }
+
+  th.operations-header,
+  td.operations-cell {
+    width: 150px;
+    min-width: 150px;
+  }
+
+  .action-button {
+    display: inline-block;
+    margin: 0 4px;
+    vertical-align: middle;
+  }
+
+  .button-text-inline {
+    display: none;
+  }
+}
+
+@media (min-width: 768px) {
+  .button-text-inline {
+    display: inline;
+  }
+}
+
+.empty-table-message {
+  text-align: center;
+  padding: 24px;
+  color: #999;
+  font-style: italic;
+}

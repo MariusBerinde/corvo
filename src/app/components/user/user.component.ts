@@ -18,6 +18,7 @@ import {CommonModule } from '@angular/common';
 import {User,Role} from '../../interfaces/user';
 import {TableLogComponent } from '../table-log/table-log.component';
 import { ManageLogService } from '../../services/manage-log.service';
+import {TableUsersComponent } from '../table-users/table-users.component'
 @Component({
   selector: 'app-user',
   standalone: true,
@@ -34,7 +35,8 @@ import { ManageLogService } from '../../services/manage-log.service';
     MatToolbarModule,
     ReactiveFormsModule,
     RouterModule,
-    TableLogComponent
+    TableLogComponent,
+    TableUsersComponent
   ],
   templateUrl: './user.component.html',
   styleUrl: './user.component.css'
