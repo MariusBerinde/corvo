@@ -14,6 +14,8 @@ import { MatDialog, } from '@angular/material/dialog';
 import { LynisTest,Lynis } from '../../interfaces/lynis';
 import {MatExpansionModule} from '@angular/material/expansion';
 import { LynisRulesComponent } from './lynis-rules/lynis-rules.component';
+import { ReportViewComponent   } from '../report-view/report-view.component';
+import { HttpClientModule } from '@angular/common/http';
 @Component({
   selector: 'app-lynis',
   imports: [
@@ -24,7 +26,9 @@ import { LynisRulesComponent } from './lynis-rules/lynis-rules.component';
     MatButtonModule,
     MatCardModule,
     MatExpansionModule,
-    RouterModule
+    RouterModule,
+    HttpClientModule,
+    ReportViewComponent
   ],
   templateUrl: './lynis.component.html',
   styleUrl: './lynis.component.css',

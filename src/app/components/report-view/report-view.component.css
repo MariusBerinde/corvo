@@ -1,0 +1,16 @@
+.search-field {
+  width: 100%;
+  margin-bottom: 12px;
+}
+
+.report-output {
+  max-height: 400px;
+  overflow-y: auto;
+  background-color: #f9f9f9;
+  padding: 12px;
+  font-family: monospace;
+  white-space: pre-wrap;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+  line-height: 1.5;
+}

@@ -9,10 +9,6 @@
     <button mat-menu-item [routerLink]="['/user']">
       <span>{{ userName }}</span>
     </button>
-    <button mat-menu-item (click)="logout()">
-      <mat-icon>logout</mat-icon>
-      <span>Logout</span>
-    </button>
   </mat-menu>
 </mat-toolbar>
 <mat-card>
@@ -28,6 +24,16 @@
 </mat-accordion>
 <br>
 
+<mat-accordion>
+  <mat-expansion-panel hideToggle>
+    <mat-expansion-panel-header>
+      <mat-panel-title>Report  </mat-panel-title>
+    </mat-expansion-panel-header>
+        <report-view></report-view>
+        <p>verso report</p>
+  </mat-expansion-panel>
+</mat-accordion>
+    <br>
 <mat-accordion>
   <mat-expansion-panel hideToggle>
     <mat-expansion-panel-header>
