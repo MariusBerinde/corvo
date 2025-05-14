@@ -222,9 +222,6 @@ export class AuthService {
   }
 /**
  * Updates the role of a user identified by their email address.
- *
- * Logs the role change action and updates the user's role if the user exists.
- *
  * @param email - The email address of the user whose role is to be updated.
  * @param newRole - The new role to assign to the user (e.g., Supervisor or Worker).
  * @returns true if the role was successfully updated; false if no user was found with the given email.
@@ -241,7 +238,13 @@ export class AuthService {
     }
 
   }
-
+/**
+ * Retrieves information for all users without including their passwords.
+ * Creates a safe version of the user list by removing the password field from each user object.
+ *
+ * @returns An array of user objects with all properties except for the password field.
+ * Each object is of type Omit<User, 'pwd'>, representing a User without the 'pwd' property.
+ */
 getAllUsersInfo(): Omit<User, 'pwd'>[] {
     return this.tmpUsers.map(user => {
       const { pwd, ...userWithoutPwd } = user;

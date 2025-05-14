@@ -1,30 +1,40 @@
 <h2 mat-dialog-title>Scegli regola da inserire</h2>
 
-<mat-dialog-actions>
-  <p>lunghezza mini{{data.mini.length}}</p>
-  <div class="scrollable-list-container">
+<div class="dialog-body">
 
-  <mat-selection-list #rules class="scrollable-list" >
-    @for(rule of data.mini; track rule){
-    <mat-list-option [value]="rule.id">{{rule.id}}-{{rule.desc}}</mat-list-option>
+  <!-- Visualizzazione regole selezionate sopra -->
+  <div class="selected-rules-container">
+    <h4>Regole selezionate:</h4>
+    @if (selectedRules.length > 0) {
+      <mat-list>
+        @for (element of selectedRules; track element) {
+          <mat-list-item>{{ element }}</mat-list-item>
+        }
+      </mat-list>
+    } @else {
+      <p><em>Nessuna regola selezionata</em></p>
     }
-  </mat-selection-list>
-
   </div>
 
-  <button mat-button (click)="save(rules)">Salva</button>
-  <br>
-  @if(selectedRules.length>0){
-  <mat-list>
-    @for(element of selectedRules;track element) {
-      <mat-list-item>{{element}}</mat-list-item>
-    }
-  </mat-list>
-  }@else{
-  <span>lista degli elementi selezionati vuota</span>
-  }
+<mat-form-field appearance="outline" class="search-field">
+  <mat-label>Cerca regola</mat-label>
+  <input matInput [formControl]="searchControl" placeholder="ID o descrizione" />
+</mat-form-field>
 
-  <button mat-button (click)="rules.selectedOptions.clear()">clear</button>
-  <br>
-  <button mat-button mat-dialog-close>Close</button>
-</mat-dialog-actions>
+<div class="scrollable-list-container">
+  <mat-selection-list #rules class="scrollable-list">
+    <mat-list-option *ngFor="let rule of filteredAvailableRules" [value]="rule.id">
+      {{ rule.id }} - {{ rule.desc }}
+    </mat-list-option>
+  </mat-selection-list>
+</div>
+
+  <div class="button-row">
+    <span class="info-label">Totale regole: {{ data.mini.length }}</span>
+    <span class="spacer"></span>
+    <button mat-button color="primary" (click)="save(rules)">Salva</button>
+    <button mat-button (click)="rules.selectedOptions.clear()">Clear</button>
+    <button mat-button mat-dialog-close>Close</button>
+  </div>
+
+</div>

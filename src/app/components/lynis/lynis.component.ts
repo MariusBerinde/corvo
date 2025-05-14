@@ -1,4 +1,3 @@
-//import { Component,OnInit,ChangeDetectionStrategy,signal,inject, ChangeDetectorRef } from '@angular/core';
 import { Component,OnInit,ChangeDetectionStrategy,inject, ChangeDetectorRef } from '@angular/core';
 import { MatMenuModule } from '@angular/material/menu';
 import { MatToolbarModule } from '@angular/material/toolbar';
@@ -11,14 +10,10 @@ import { LocalWriteService } from '../../services/local-write.service';
 import { ManageLogService } from '../../services/manage-log.service';
 import { AuthService } from '../../services/auth.service';
 import {MatListModule, } from '@angular/material/list';
-//import {MatListModule, MatSelectionList, MatListOption} from '@angular/material/list';
-import {
-  MatDialog, } from '@angular/material/dialog';
-
+import { MatDialog, } from '@angular/material/dialog';
 import { LynisTest,Lynis } from '../../interfaces/lynis';
 import {MatExpansionModule} from '@angular/material/expansion';
 import { LynisRulesComponent } from './lynis-rules/lynis-rules.component';
-//import { firstValueFrom } from 'rxjs';
 @Component({
   selector: 'app-lynis',
   imports: [
