@@ -35,9 +35,24 @@ export class ManageServerService {
     }
   ];
   constructor() { }
+
+/**
+ * Returns the complete list of available servers.
+ *
+ * @returns An array of `Server` objects currently stored in the system.
+ */
   public getAllServers():Server[]{
     return this.listaServer;
   }
+/**
+ * Retrieves a server object based on its IP address.
+ *
+ * Searches the server list for a match with the provided IP.
+ * If no server is found, returns a default `Server` object with empty or false values.
+ *
+ * @param ip - The IP address of the server to retrieve.
+ * @returns The matching `Server` object if found; otherwise, a default `Server` with empty fields and `state` set to `false`.
+ */
   public getServerByIp(ip:string):Server{
     const ris=this.listaServer.find(s=>s.ip===ip);
     if(ris == undefined)

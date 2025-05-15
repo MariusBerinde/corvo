@@ -89,6 +89,14 @@ private listaRegole:Rule[]=[
     "ip":"193.168.111.114"
   }];
   constructor() { }
+/**
+ * Retrieves all rules associated with a specific IP address.
+ *
+ * Filters the list of rules to find those that match the provided IP.
+ *
+ * @param ip - The IP address for which rules are to be retrieved.
+ * @returns An array of `Rule` objects matching the IP; returns an empty array if no matches are found.
+ */
   getRulesByIp(ip:string):Rule[]{
     const rules = this.listaRegole.filter(rule=>rule.ip===ip );
     if (rules.length >= 1) {
