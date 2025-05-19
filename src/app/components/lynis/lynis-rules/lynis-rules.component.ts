@@ -55,11 +55,7 @@ export class LynisRulesComponent implements OnInit {
 
   save(rulesList: MatSelectionList): void {
     this.selectedRules = [];
-    if (
-      rulesList &&
-      rulesList.selectedOptions &&
-      rulesList.selectedOptions.selected.length > 0
-    ) {
+    if ( rulesList && rulesList.selectedOptions && rulesList.selectedOptions.selected.length > 0) {
       const selectedIds: (string | undefined)[] =
         rulesList.selectedOptions.selected.map((option) => option.value);
 
@@ -68,6 +64,7 @@ export class LynisRulesComponent implements OnInit {
           this.selectedRules.push(String(id));
         }
       });
+      console.log(this.selectedRules);
 
       this.dialogRef.close(this.selectedRules);
     }
@@ -75,5 +72,8 @@ export class LynisRulesComponent implements OnInit {
 
   onCloseDialog(): void {
     this.dialogRef.close(undefined);
+  }
+  quit():void{
+    this.dialogRef.close();
   }
 }

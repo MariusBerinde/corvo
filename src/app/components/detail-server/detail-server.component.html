@@ -23,7 +23,6 @@
 <mat-card>
   <mat-card-header>
     <mat-card-title> Dettagli server</mat-card-title>
-
   </mat-card-header>
 
 
@@ -49,6 +48,7 @@
         <span matListItemTitle>Regole generali</span>
       @for(val of generalRules; track val.id) {
         <span matListItemLine>Descrizione:{{val.descr}}</span>
+
       }
       </mat-list-item>
       }

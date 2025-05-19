@@ -81,7 +81,7 @@ export class LynisComponent implements OnInit{
       this.router.navigate(['']);
   }
 testDialog() {
-    console.log("valore di mini0=", this.mini[0]?.id);
+    //console.log("valore di mini0=", this.mini[0]?.id);
     const dialogRef = this.dialog.open(LynisRulesComponent, {
       maxWidth: '90vw',
       maxHeight: '90vh',
@@ -105,7 +105,7 @@ testDialog() {
         console.log("Nessun elemento selezionato o dialog annullato.");
       }
     });
-    console.log("Valore di listIdSkippedTest dopo subscribe (prima della chiusura del dialog):", this.acutalConfig.listIdSkippedTest);
+    //console.log("Valore di listIdSkippedTest dopo subscribe (prima della chiusura del dialog):", this.acutalConfig.listIdSkippedTest);
   }
 
 

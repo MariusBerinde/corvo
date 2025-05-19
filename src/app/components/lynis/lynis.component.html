@@ -30,7 +30,6 @@
       <mat-panel-title>Report  </mat-panel-title>
     </mat-expansion-panel-header>
         <report-view></report-view>
-        <p>verso report</p>
   </mat-expansion-panel>
 </mat-accordion>
     <br>
@@ -51,12 +50,9 @@
         <span>Non ci sono regole disabilite</span>
         }
         <br>
-        <span>Test stato config attuale {{acutalConfig.auditor}},{{acutalConfig.listIdSkippedTest.length}}</span>
-        <br>
-
-    <p>This is the primary content of the panel.</p>
         <button mat-raised-button >Lancia scansione</button>
-        <br>
+        <span class="spacer"></span>
+        <span class="spacer"></span>
         <button mat-raised-button (click)="testDialog()">Aggiungi regola da disabilitare</button>
   </mat-expansion-panel>
 </mat-accordion>
