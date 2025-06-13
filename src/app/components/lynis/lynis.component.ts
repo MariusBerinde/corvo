@@ -37,7 +37,7 @@ import { HttpClientModule } from '@angular/common/http';
 export class LynisComponent implements OnInit{
 
   userName: string = '';
-  acutalConfig:Lynis={ auditor:"", listIdSkippedTest:[] };
+  acutalConfig:Lynis={ id:0,ip:"193.199.11.1",auditor:"", listIdSkippedTest:[]};
   descTest:LynisTest[]=[];
   mini:LynisTest[]=[];
   risDialog:string[]=[];
@@ -56,10 +56,10 @@ export class LynisComponent implements OnInit{
 
   ngOnInit():void{
     this.userName = this.loadUserName();
-    this.acutalConfig=this.lynis.getActualConfig();
     this.descTest = this.lynis.getSkippableTestList();
     this.mini = this.descTest.slice(0,20);
     this.ip = this.inRoute.snapshot.paramMap.get('ip')??'errore navigazione';
+    this.acutalConfig=this.lynis.getActualConfig(this.ip);
   }
   loadUserName(): string {
     const email = this.storage.getData('email') ?? 'default';

@@ -501,10 +501,33 @@ export class ManageLynisService {
 {"id":"USB-2000",   "os":"Linux",      "desc":"Check USB authorizations (security)"},
 {"id":"USB-3000",   "os":"Linux",      "desc":"Check for presence of USBGuard (security)"},
   ];
-  actualConif:Lynis={
-    "auditor":"lol",
-    "listIdSkippedTest":[]
-  };
+protected listConfigs:Lynis[] = [
+  {
+      "id":0,
+      "ip": "193.168.111.111",
+      "auditor": "lol",
+      "listIdSkippedTest":[]
+  },
+  {
+      "id":1,
+      "ip": "193.168.111.112",
+      "auditor": "lol",
+      "listIdSkippedTest":[]
+  },
+  {
+      "id":2,
+      "ip": "193.168.111.113",
+      "auditor": "lol",
+      "listIdSkippedTest":[]
+  },
+
+  {
+      "id":2,
+      "ip": "193.168.111.113",
+      "auditor": "lol",
+      "listIdSkippedTest":[]
+  },
+  ];
   constructor() { }
 /**
  * Retrieves the list of Lynis tests that can be skipped.
@@ -516,30 +539,44 @@ export class ManageLynisService {
 /**
  * Sets the auditor name in the current Lynis configuration.
  * @param user - The name of the auditor to assign.
- */
-  setAuditor(user:string){
+  setAuditor(user:string,){
     this.actualConif.auditor=user;
   }
+
+ */
+
+  //---
 /**
  * Replaces the current Lynis configuration with the provided one.
  * @param config - The new Lynis configuration object.
- */
+
   setConfig(config:Lynis){
     this.actualConif=config;
   }
+  */
 /**
  * Returns the current Lynis configuration in use.
  * @returns The current Lynis configuration object.
  */
-  getActualConfig():Lynis{
-    return this.actualConif;
+  getActualConfig(ip:string):Lynis{
+    const localConfig = this.listConfigs.find(c => c.ip===ip);
+    if(localConfig === undefined)
+      return {
+      "id":-1,
+      "ip": "",
+      "auditor": "lol",
+      "listIdSkippedTest":[]
+      };
+
+    return  localConfig;
   }
 /**
  * Retrieves the list of IDs of the tests that have been skipped in the current configuration.
  * @returns An array of test ID strings that were skipped.
  */
-  getSkippedTests():string[]{
-    return this.actualConif.listIdSkippedTest;
+  getSkippedTests(ip:string):string[]{
+    const localConfig = this.listConfigs.find(c => c.ip===ip);
+    return localConfig?.listIdSkippedTest??[];
   }
 
 }
