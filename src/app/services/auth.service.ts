@@ -3,11 +3,7 @@ import {User,Role} from '../interfaces/user';
 import * as bcrypt from 'bcryptjs';
 import {ManageLogService } from './manage-log.service';
 import {LocalWriteService} from './local-write.service';
-import { error } from 'console';
-import {HttpClient,HttpClientModule,HttpHeaders, HttpResponse} from '@angular/common/http';
-import { response } from 'express';
-import { BlockScrollStrategy } from '@angular/cdk/overlay';
-import { filter } from 'rxjs/operators';
+import {HttpClient,HttpHeaders } from '@angular/common/http';
 @Injectable({
   providedIn: 'root'
 })
@@ -137,13 +133,49 @@ export class AuthService {
       pwd: pwdHash,
       role,
     };
-    /*
-    this.tmpUsers.push(newUser);
-    this.log.setLog(this.actualUsername,`Creato account con email ${email}`)
-    console.log(' Utente creato:', newUser);
-    */
 
     return true;
+  }
+
+  createUser2(email: string, username: string, plainPwd: string, role: Role = Role.Worker):Promise<boolean>{
+
+    const data = {
+      "username":"lol",
+      "user":{"name":username,"email":email,"password":plainPwd,"role":role}
+    };
+    console.log("dentro isEmailApproved");
+    const url = 'http://localhost:8083/addUser';
+
+    return new Promise((resolve) => {
+      this.http.post(url, data, {
+        observe: 'response'
+      }).subscribe({
+          next: (response) => {
+            console.log("Status in createUser2 =", response.status);
+            console.log("Body in createUser2 =", response.body);
+
+            // Email approvata solo se status è 200
+            resolve(response.status === 200);
+          },
+          error: (error) => {
+            console.log("Error in createUser2 - Status =", error.status);
+
+            // Gestisci i diversi casi di errore
+            if(error.status === 200)
+              resolve(true)
+            if (error.status === 404) {
+              console.log("Email non trovata nella lista approvate");
+            } else if (error.status === 400) {
+              console.log("Richiesta malformata");
+            } else {
+              console.log("Errore generico:", error);
+            }
+
+            resolve(false);
+          }
+        });
+    });
+
   }
 
   /*  Returns the data of the user with the given email
@@ -233,6 +265,42 @@ export class AuthService {
   isEmailApproved(email:string):boolean{
     const index=this.approvedUsers.indexOf(email);
     return (index>=0 && index<=this.approvedUsers.length)
+  }
+
+  isEmailApproved2(email: string): Promise<boolean> {
+    const data = {"email": email};
+    console.log("dentro isEmailApproved");
+    const url = 'http://localhost:8083/isEmailApproved';
+
+    return new Promise((resolve) => {
+      this.http.post(url, data, {
+        observe: 'response'
+      }).subscribe({
+          next: (response) => {
+            console.log("Status in isEmailApproved2 =", response.status);
+            console.log("Body in isEmailApproved2 =", response.body);
+
+            // Email approvata solo se status è 200
+            resolve(response.status === 200);
+          },
+          error: (error) => {
+            console.log("Error in isEmailApproved2 - Status =", error.status);
+
+            // Gestisci i diversi casi di errore
+            if(error.status === 200)
+              resolve(true)
+            if (error.status === 404) {
+              console.log("Email non trovata nella lista approvate");
+            } else if (error.status === 400) {
+              console.log("Richiesta malformata");
+            } else {
+              console.log("Errore generico:", error);
+            }
+
+            resolve(false);
+          }
+        });
+    });
   }
  /**
    * Retrieves the list of currently approved users.

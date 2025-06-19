@@ -54,15 +54,53 @@ export class RegistrazioneComponent {
       this.pwdI=this.formRegistrazione.value.pwd??'null';
       this.pwdRI=this.formRegistrazione.value.pwdR??'null';
       const pwdUguali=this.pwdI===this.pwdRI;
-      this.preApprovedEmail = this.auth.isEmailApproved(this.emailI);
+      //this.preApprovedEmail = this.auth.isEmailApproved(this.emailI);
 
       console.log("valore scritto:",this.emailI);
-      console.log("Provo a navigare verso welcome");
-      if(this.preApprovedEmail){
 
+      this.checkEmail(this.emailI).then(
+        isValid => {
+          console.log("controllo mail")
+          if(isValid){
+            console.log("mail valida");
+            if(pwdUguali){
+              let username=this.emailI.substring(0,this.emailI.indexOf('@'));
+              this.auth.createUser2(this.emailI,username,this.pwdI).then(
+                isCreated =>{
+                  if(isCreated){
+                    this.lS.saveData('email',this.emailI);
+                    console.log("Provo a navigare verso welcome");
+                    this._router.navigate(['']);
+                  }else{
+
+                this.errorCreationUser = true;
+                  }
+                }
+              );
+              /*
+              if(this.auth.createUser(this.emailI,username,this.pwdI)){
+
+                    this.lS.saveData('email',this.emailI);
+                    console.log("Provo a navigare verso welcome");
+                    this._router.navigate(['']);
+              }else{
+                this.errorCreationUser = true;
+              }
+              */
+            }
+            else{
+              let username=this.emailI.substring(0,this.emailI.indexOf('@'));
+              console.log("test estrazione username:",username);
+              console.log("password non coincidenti");
+              this.errorRePassword = true;
+            }
+          }
+        }
+      );
+      /*
+      if(this.preApprovedEmail){
         if(pwdUguali){
           let username=this.emailI.substring(0,this.emailI.indexOf('@'));
-
           if(this.auth.createUser(this.emailI,username,this.pwdI)){
             this.lS.saveData('email',this.emailI);
             this._router.navigate(['']);
@@ -77,7 +115,11 @@ export class RegistrazioneComponent {
           this.errorRePassword = true;
         }
       }
+      */
     }
+  }
+  private checkEmail(email:string):Promise<boolean>{
+    return this.auth.isEmailApproved2(email);
   }
 
 

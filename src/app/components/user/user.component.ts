@@ -85,6 +85,29 @@ export class UserComponent {
         this.pwdRI = this.formResetPwd.value.pwdR?? '';
         this.pwdOldI = this.formResetPwd.value.pwdOld??'';
         //controllo che sia la vera vecchia oldPwd
+
+      /*
+        this.authService.checkUserPwd(this.actualUser.email,this.pwdOldI).then(
+          isValid =>{
+            if(isValid){
+              console.log("old pwd ok");
+              if(this.pwdI===this.pwdRI ){
+                if(this.pwdI!=this.pwdOldI){
+                  console.log("cambio pwd ok");
+                  this.authService.setNewPwd(this.actualUser.email,this.pwdI);
+                  //this.router.navigate(['']);
+                  this.logout();
+                }
+                else{
+                  this.errorReusedOldPwd = true;
+                }
+              } else{
+                this.errorPwdR = true;
+                }
+            }else{ this.errorInsertOldPwd = true; var tmp='vecchia pwd errata valore inserito:'+this.pwdOldI }
+          }
+        );
+      */
         if(this.authService.checkUserPwd1(this.actualUser.email,this.pwdOldI)){
           console.log("old pwd ok");
           if(this.pwdI===this.pwdRI ){
