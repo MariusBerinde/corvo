@@ -1,7 +1,7 @@
 import { Component } from '@angular/core';
-import { RouterOutlet } from '@angular/router';
-import {LoginComponent } from '../login/login.component';
-import {RegistrazioneComponent} from '../registrazione/registrazione.component';
+//import { RouterOutlet } from '@angular/router';
+//import {LoginComponent } from '../login/login.component';
+//import {RegistrazioneComponent} from '../registrazione/registrazione.component';
 import { Router } from '@angular/router';
 import {LocalWriteService} from '../../services/local-write.service';
 import {MatButtonModule} from '@angular/material/button';
@@ -17,8 +17,11 @@ export class WelcomeComponent {
 
   title = 'corvo';
   valore_letto='default';
+  esito:boolean=false;
+
 
 constructor(private _router: Router,private lS:LocalWriteService) { }
+
 navigateToLogin(){
   this._router.navigate(['../login/']);
 }

@@ -4,7 +4,10 @@ import * as bcrypt from 'bcryptjs';
 import {ManageLogService } from './manage-log.service';
 import {LocalWriteService} from './local-write.service';
 import { error } from 'console';
-
+import {HttpClient,HttpClientModule,HttpHeaders, HttpResponse} from '@angular/common/http';
+import { response } from 'express';
+import { BlockScrollStrategy } from '@angular/cdk/overlay';
+import { filter } from 'rxjs/operators';
 @Injectable({
   providedIn: 'root'
 })
@@ -34,7 +37,8 @@ export class AuthService {
  */
   constructor(
     private log:ManageLogService,
-    private storage:LocalWriteService
+    private storage:LocalWriteService,
+    private http:HttpClient
   ) {
     const localEmail:string  = this.storage.getData('email')??'';
     if(localEmail.length>0){
@@ -60,13 +64,47 @@ export class AuthService {
   cmpPlainPwd(plain:string,encripted:string):boolean{
     return bcrypt.compareSync(plain,encripted);
   }
+
   /*
    * Checks whether the provided password matches the password of the user with the given email.
    * @param email - the user email
    * @param pwd - the password of the user
    * @returns true if pwd is the password of the user false otherwise
    */
-  checkUserPwd(email:string,pwd:string):boolean{
+  checkUserPwd(email:string,pwd:string):Promise<boolean>{
+
+
+    const data={"email":email,"password":pwd};
+    console.log("test richiesta post");
+    const url = 'http://localhost:8083/authUser';
+    return new Promise(
+      (resolve) => {
+        this.http.post(
+          url,data,{
+        observe: 'response'
+          }
+
+        ).subscribe(
+            {
+              next:(response)=>{
+                console.log("Status in checkUserPwd =",response.status);
+                console.log("Body in checkUserPwd =",response.body);
+                resolve(response.status === 200);
+              },
+              error:(error)=>{
+                console.log("error in checkUserPwd =",error.status);
+                resolve(false);
+              }
+
+            });
+
+      });
+
+  }
+
+  checkUserPwd1(email:string,pwd:string):boolean{
+
+
     const hash:string |  undefined= this.tmpUsers.find(user=>user.email===email)?.pwd;
 
     if (!hash) {
@@ -99,9 +137,12 @@ export class AuthService {
       pwd: pwdHash,
       role,
     };
+    /*
     this.tmpUsers.push(newUser);
     this.log.setLog(this.actualUsername,`Creato account con email ${email}`)
     console.log(' Utente creato:', newUser);
+    */
+
     return true;
   }
 
@@ -252,5 +293,59 @@ getAllUsersInfo(): Omit<User, 'pwd'>[] {
     });
   }
 
+  testPing1(username: string): Promise<boolean> {
+    const url = 'http://localhost:8083/ping1';
+
+    const headers = new HttpHeaders({
+      'Content-Type': 'application/json',
+      'username': username
+    });
+
+    return new Promise<boolean>((resolve) => {
+      this.http.get<any>(url, {
+        headers: headers,
+        observe: 'response'
+      }).subscribe({
+          next: (response) => {
+            console.log('✅ Status:', response.status);
+            console.log('📦 Body:', response.body);
+            resolve(response.status === 200);
+          },
+          error: (error) => {
+
+            console.error('❌ Errore HTTP:', error.status);
+            if(error.status!==200){
+            resolve(false);
+            }
+          }
+        });
+    });
+  }
+
+  testPost( username:string):void{
+    const data={"username":username};
+    console.log("test richiesta post");
+    const url = 'http://localhost:8083/ping2';
+    var statusMsg=0;
+    var mgs;
+    this.http.post(url,data,{
+        observe: 'response'
+    }).subscribe({
+          next: (response) => {
+          statusMsg = response.status
+          mgs=response.body;
+            console.log('✅ Status:', response.status);
+            console.log('📦 Body:', response.body);
+          },
+
+          error: (error) => {
+            console.error('❌ Errore HTTP:', error.status);
+          }
+        });
+
+    console.log("testPost status=",statusMsg);
+    console.log("testPost body=",mgs);
+
+  }
 
 }

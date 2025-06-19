@@ -85,7 +85,7 @@ export class UserComponent {
         this.pwdRI = this.formResetPwd.value.pwdR?? '';
         this.pwdOldI = this.formResetPwd.value.pwdOld??'';
         //controllo che sia la vera vecchia oldPwd
-        if(this.authService.checkUserPwd(this.actualUser.email,this.pwdOldI)){
+        if(this.authService.checkUserPwd1(this.actualUser.email,this.pwdOldI)){
           console.log("old pwd ok");
           if(this.pwdI===this.pwdRI ){
             if(this.pwdI!=this.pwdOldI){

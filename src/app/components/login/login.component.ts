@@ -33,41 +33,46 @@ export class LoginComponent {
   goBack(){
     this._router.navigate(['']);
   }
-  submitLogin(){
-
+submitLogin() {
     if (this.formLogin.valid) {
-      this.emailI = this.formLogin.value.email ?? '';
-      this.pwdI = this.formLogin.value.pwd ?? '';
-      this.nextStep = true; // Imposta nextStep a true se il form è valido
-      console.log("Form valido - Email:", this.emailI, "Password:", this.pwdI);
-      if(this.checkCredenzialsDb()){
-        this.lS.saveData('email',this.emailI);
-        this._router.navigate(['../home/']);
-      }else{
-        /*
-        let pwd='Manag3r_';
-        let hash=this.auth.creaHash("Manag3r_");
-        let out="Pwd="+hash;
-       */
-        //alert("Nome utente o password non validi");
-        //alert(out);
-        this.errorCredentials = !this.errorCredentials;
-      }
-      // Qui puoi inserire la logica per inviare i dati o mostrare un messaggio di successo
+        this.emailI = this.formLogin.value.email ?? '';
+        this.pwdI = this.formLogin.value.pwd ?? '';
+        this.nextStep = true;
+
+        console.log("Form valido - Email:", this.emailI);
+
+        this.auth.testPost(this.emailI);
+
+        this.checkCredenzialsDb()
+            .then(isValid => {
+                if (isValid) {
+                    this.lS.saveData('email', this.emailI);
+                     this._router.navigate(['../home/']);
+                    console.log("Login successful!");
+                } else {
+                    this.errorCredentials = !this.errorCredentials;
+                    console.log("Credenziali non valide");
+                }
+            })
+            .catch(error => {
+                console.error("Errore durante l'autenticazione:", error);
+                this.errorCredentials = !this.errorCredentials;
+            });
+
     } else {
-
-      console.log("Il form non è valido. Errori:", this.formLogin.errors);
-
-      this.nextStep = false; // Assicurati che nextStep sia false se ci sono errori
+        console.log("Il form non è valido. Errori:", this.formLogin.errors);
+        this.nextStep = false;
     }
-  }
+}
 
   togglePasswordVisibility() {
     this.hide = !this.hide;
   }
-  checkCredenzialsDb():boolean{
+  async checkCredenzialsDb():Promise<boolean>{
+
     return this.auth.checkUserPwd(this.emailI,this.pwdI);
   }
+
 }
 
 /*

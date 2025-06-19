@@ -9,7 +9,7 @@ import {MatIconModule} from '@angular/material/icon';
 import {MatInputModule} from '@angular/material/input';
 import {Router } from '@angular/router';
 import {LocalWriteService} from '../../services/local-write.service';
-import {WelcomeComponent } from '../welcome/welcome.component';
+//import {WelcomeComponent } from '../welcome/welcome.component';
 import {AuthService } from '../../services/auth.service';
 @Component({
   selector: 'app-registrazione',
