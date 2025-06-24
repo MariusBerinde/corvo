@@ -34,7 +34,7 @@ export class DetailServerComponent implements OnInit{
 
   ip:string|null='';
   localServer:Server = {
-      "id":"",
+      "id":0,
       "ip":"",
       "state":false,
       "name":"",
@@ -70,7 +70,7 @@ export class DetailServerComponent implements OnInit{
      this.actualUser = this.storage.getData('email')??'';
 
      this.log.setLog(this.actualUser,"Corvo:visione status server="+this.ip);
-     if(this.localServer.id===""){
+     if(this.localServer.id===-1){
        alert("Problema di rete sarai disconnesso");
        this.logout();
      }

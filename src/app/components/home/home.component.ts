@@ -33,7 +33,9 @@ import { TableServicesComponent } from '../table-services/table-services.compone
 })
 export class HomeComponent {
   userName: string = '';
-  servers: Server[] = [];
+  //servers: Server[] = [];
+  servers = signal<Server[]> ([]);
+  isLoaded = false;
   readonly panelOpenState = signal(true);
 
   constructor(
@@ -43,7 +45,23 @@ export class HomeComponent {
     private storage: LocalWriteService
   ) {
     this.userName = this.loadUserName();
-    this.servers = this.serverService.getAllServers();
+    //this.servers = this.serverService.getAllServers();
+     this.serverService.getAllServersO().subscribe(
+      {
+        next:(tmp:Server[]) => {
+          console.log("caricamento servers = ",tmp);
+
+          //this.servers = tmp;
+          this.isLoaded = true;
+          this.servers.set(tmp)
+        },
+        error: (error)=>{
+          console.log("errore servers =",error);
+
+        }
+
+      }
+    );
   }
 
   loadUserName(): string {
@@ -64,6 +82,7 @@ export class HomeComponent {
 
 
   logout() {
+    this.storage.clearData();
       this.router.navigate(['']);
   }
  dettagliServer(ip:string){

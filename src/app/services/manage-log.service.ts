@@ -1,5 +1,9 @@
 import { Injectable } from '@angular/core';
 import { Log } from '../interfaces/log';
+import { Observable, throwError } from 'rxjs';
+import {HttpClient,HttpHeaders,HttpErrorResponse,HttpResponse } from '@angular/common/http';
+import { retry, catchError,map } from 'rxjs/operators';
+import {LocalWriteService} from './local-write.service';
 
 @Injectable({
   providedIn: 'root'
@@ -9,80 +13,124 @@ export class ManageLogService {
   protected listaLog:Log[]=[{
     "id":0,
     "data":"Mon May 05 2025 10:48:30 GMT+0200 (Ora legale dell’Europa centrale)",
-    "user":"t1@gmail.com",
-    "desc":"creato utente XXXX"
+    "userEmail":"t1@gmail.com",
+    "descr":"creato utente XXXX"
   },
   {
     "id":1,
     "data":"Mon May 05 2025 10:48:30 GMT+0200 (Ora legale dell’Europa centrale)",
-    "user":"t1@gmail.com",
-    "desc":"creato utente YYYY"
+    "userEmail":"t1@gmail.com",
+    "descr":"creato utente YYYY"
   },
   {
     "id":2,
     "data":"Mon May 05 2025 11:48:30 GMT+0200 (Ora legale dell’Europa centrale)",
-    "server":"193.168.111.111",
-    "user":"t1@gmail.com",
-    "desc":"creato db",
+    "ip":"193.168.111.111",
+    "userEmail":"t1@gmail.com",
+    "descr":"creato db",
   },
   {
     "id":3,
     "data":"Mon May 05 2025 11:48:30 GMT+0200 (Ora legale dell’Europa centrale)",
-    "server":"193.168.111.112",
-    "user":"t1@gmail.com",
-    "desc":"creato db",
+    "ip":"193.168.111.112",
+    "userEmail":"t1@gmail.com",
+    "descr":"creato db",
   },
   {
     "id":4,
     "data":"Mon May 05 2025 11:50:30 GMT+0200 (Ora legale dell’Europa centrale)",
-    "server":"193.168.111.113",
-    "user":"t1@gmail.com",
-    "desc":"creato db",
+    "ip":"193.168.111.113",
+    "userEmail":"t1@gmail.com",
+    "descr":"creato db",
   },
   {
     "id":5,
     "data":"Mon May 05 2025 11:50:30 GMT+0200 (Ora legale dell’Europa centrale)",
-    "server":"193.168.111.113",
-    "user":"t1@gmail.com",
-    "desc":"modificata regola XXX",
+    "ip":"193.168.111.113",
+    "userEmail":"t1@gmail.com",
+    "descr":"modificata regola XXX",
   },
   {
     "id":6,
     "data":"Mon May 05 2025 11:50:30 GMT+0200 (Ora legale dell’Europa centrale)",
-    "server":"193.168.111.113",
-    "user":"t2@gmail.com",
-    "desc":" modificata regola YYY",
+    "ip":"193.168.111.113",
+    "userEmail":"t2@gmail.com",
+    "descr":" modificata regola YYY",
   },
   {
     "id":7,
     "data":"Mon May 05 2025 11:50:30 GMT+0200 (Ora legale dell’Europa centrale)",
-    "server":"193.168.111.113",
-    "user":"t2@gmail.com",
-    "desc":"modificata regola ZZZ",
+    "ip":"193.168.111.113",
+    "userEmail":"t2@gmail.com",
+    "descr":"modificata regola ZZZ",
   },
 
   {
     "id":8,
     "data":"Mon May 05 2025 11:50:30 GMT+0200 (Ora legale dell’Europa centrale)",
-    "server":"193.168.111.113",
-    "user":"t2@gmail.com",
-    "desc":" inserita regola ABC",
+    "ip":"193.168.111.113",
+    "userEmail":"t2@gmail.com",
+    "descr":" inserita regola ABC",
   },
 
   {
     "id":9,
     "data":"Mon May 05 2025 11:50:30 GMT+0200 (Ora legale dell’Europa centrale)",
-    "server":"193.168.111.113",
-    "user":"t2@gmail.com",
-    "desc":"Modificata regola ACD",
+    "ip":"193.168.111.113",
+    "userEmail":"t2@gmail.com",
+    "descr":"Modificata regola ACD",
   }
   ];
-  constructor() { }
+  email:string='';
+  constructor(
+
+    private storage:LocalWriteService,
+    private http:HttpClient
+  ) {
+
+    const localEmail:string  = this.storage.getData('email')??'';
+
+      if(localEmail.length>0)
+        this.email = localEmail;
+  }
   /* Returns all the log from the database
    */
   getAllLogs():Log[]{
     return this.listaLog;
   }
+
+  public getAllLogsO():Observable<Log[]>{
+
+    const url = 'http://localhost:8083/getAllLogs';
+    const headers = new HttpHeaders({
+      'Content-Type': 'application/json',
+      'username': this.email
+    });
+
+    return this.http.get<Log[]>(url, {
+      headers: headers,
+      observe: 'response'
+    }).pipe(
+      map((response: HttpResponse<Log[]>) => response.body!),
+      retry(2),
+      catchError(this.handleError)
+    );
+  }
+
+  private handleError =   (error: HttpErrorResponse): Observable<never> => {
+  console.error('Errore API:', error);
+
+  let errorMessage = 'Errore sconosciuto';
+  if (error.status === 0) {
+    errorMessage = 'Errore di connessione al server';
+  } else if (error.status >= 400 && error.status < 500) {
+    errorMessage = 'Errore nella richiesta';
+  } else if (error.status >= 500) {
+    errorMessage = 'Errore del server';
+  }
+
+  return throwError(() => new Error(errorMessage));
+}
 
 /**
  * Returns all logs associated with a user given their email address.
@@ -91,7 +139,7 @@ export class ManageLogService {
  */
 getUserLog(email: string): Log[] {
   console.log("email ricevuta =",email);
-  const userLogs = this.listaLog.filter(log => log.user === email);
+  const userLogs = this.listaLog.filter(log => log.userEmail === email);
 
     /*
   if (userLogs.length > 1) {
@@ -110,6 +158,25 @@ getUserLog(email: string): Log[] {
     }
 
 }
+ getUserLogO(email: string){
+
+    const url = 'http://localhost:8083/getUserLogs';
+    const headers = new HttpHeaders({
+      'Content-Type': 'application/json',
+      'email': this.email
+    });
+    console.log("lanciato getUserLog ");
+
+    return this.http.get<Log[]>(url, {
+      headers: headers,
+      observe: 'response'
+    }).pipe(
+      map((response: HttpResponse<Log[]>) => response.body!),
+      retry(2),
+      catchError(this.handleError)
+    );
+  }
+
 
   /**
   * create a log with user,descr,server,service as params
@@ -127,10 +194,10 @@ getUserLog(email: string): Log[] {
     const actualLog:Log={
       id:lastId+1,
       data:currentDateStr,
-      user:user,
-      server:server,
+      userEmail:user,
+      ip:server,
       service:service,
-      desc:descr,
+      descr:descr,
     };
 
    this.listaLog.push(actualLog);

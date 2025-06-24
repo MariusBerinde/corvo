@@ -78,6 +78,7 @@ export class LynisComponent implements OnInit{
   }
 
   logout() {
+    this.storage.clearData();
       this.router.navigate(['']);
   }
 testDialog() {

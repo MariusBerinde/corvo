@@ -1,8 +1,8 @@
 export interface Log {
   id:number,
   data:string,
-  user:string, //è l'email
-  server?:string,
+  userEmail:string, //è l'email
+  ip?:string,
   service?:string,
-  desc:string
+  descr:string
 }

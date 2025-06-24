@@ -4,11 +4,17 @@ import * as bcrypt from 'bcryptjs';
 import {ManageLogService } from './manage-log.service';
 import {LocalWriteService} from './local-write.service';
 import {HttpClient,HttpHeaders } from '@angular/common/http';
+import { BehaviorSubject,  Observable,  throwError } from 'rxjs';
+
+import { catchError, tap, switchMap } from 'rxjs/operators';
 @Injectable({
   providedIn: 'root'
 })
 export class AuthService {
   actualUsername:string='';
+  private loggedUser:any = null ;
+  private readonly API_BASE = 'http://localhost:8083';
+
   tmpUsers:User[]=[
     {
       "email":"t1@gmail.com",
@@ -52,10 +58,10 @@ export class AuthService {
     const sale=bcrypt.genSaltSync(10);
     return bcrypt.hashSync(plain,sale);
   }
-  /* Check if the plain text have the encripted value
+  /* Check if the plain text have the encrypted value
    * @param plain - String the plain text
-   * @param encripted - the hash value
-   * @returns true if the plain text have encripted as hash false otherwise
+   * @param encrypted - the hash value
+   * @returns true if the plain text have encrypted as hash false otherwise
    */
   cmpPlainPwd(plain:string,encripted:string):boolean{
     return bcrypt.compareSync(plain,encripted);
@@ -85,6 +91,15 @@ export class AuthService {
               next:(response)=>{
                 console.log("Status in checkUserPwd =",response.status);
                 console.log("Body in checkUserPwd =",response.body);
+                if (response.status === 200)
+                  if( response.body !== null)
+                    this.loggedUser = response.body;
+                   var tmp:any = response.body;
+
+                  this.storage.saveData('email',tmp.email);
+                  this.storage.saveData('username',tmp.username);
+                  this.storage.saveData('role',tmp.role);
+
                 resolve(response.status === 200);
               },
               error:(error)=>{
@@ -96,6 +111,10 @@ export class AuthService {
 
       });
 
+  }
+
+  public getLoggedUser (){
+    return this.loggedUser;
   }
 
   checkUserPwd1(email:string,pwd:string):boolean{
@@ -206,6 +225,14 @@ export class AuthService {
     return this.tmpUsers.find(user=>user.email===email)?.role;
   }
 
+
+  /**
+   * Returns the role of the logged user
+   */
+  getLoggedRole():Role{
+    return this.loggedUser.role;
+  }
+
   /* Sets a new password for the user with the given email
    *  @param email - the user's  email
    *  @param newPwd - the new plain-text password to set
@@ -312,6 +339,10 @@ export class AuthService {
   getApprovedUsers():string[]{
   return this.approvedUsers;
   }
+
+
+
+
 /**
  * Removes the specified email from the list of approved users.
  * Logs the action and returns whether the removal was successful.
@@ -320,6 +351,7 @@ export class AuthService {
  * @returns True if the email was successfully removed; false if it was not found.
  */
   removeApprovedUser(email:string):boolean{
+
     const iEmail = this.approvedUsers.findIndex(e=>e===email);
     if( iEmail<0 ){
       this.log.setLog(this.actualUsername,`Tentato di cancellare pre-approvazione  per email ${email}`);
@@ -328,6 +360,45 @@ export class AuthService {
       this.log.setLog(this.actualUsername,`Cancellata pre-approvazione  per email ${email}`);
     this.approvedUsers.splice(iEmail,1);
     return true;
+  }
+
+
+  removeApprovedUserP(email:string):Promise<boolean>{
+
+    const data = { "username":this.actualUsername,"email": email};
+
+    console.log("dentro removeApprovedUserP");
+    const url = 'http://localhost:8083/deleteEnabledUser';
+
+    return new Promise((resolve) => {
+      this.http.post(url, data, {
+        observe: 'response'
+      }).subscribe({
+          next: (response) => {
+            console.log("Status in removeApprovedUserP =", response.status);
+            console.log("Body in removeApprovedUserP  =", response.body);
+
+            // Email approvata solo se status è 200
+            resolve(response.status === 200);
+          },
+          error: (error) => {
+            console.log("Error in isEmailApproved2 - Status =", error.status);
+
+            // Gestisci i diversi casi di errore
+            if(error.status === 200)
+              resolve(true)
+            if (error.status === 404) {
+              console.log("Email non trovata nella lista approvate");
+            } else if (error.status === 400) {
+              console.log("Richiesta malformata");
+            } else {
+              console.log("Errore generico:", error);
+            }
+
+            resolve(false);
+          }
+        });
+    });
   }
 /**
  * Updates the role of a user identified by their email address.

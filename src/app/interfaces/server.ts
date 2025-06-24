@@ -1,5 +1,5 @@
 export interface Server {
-  id:string,
+  id:number,
   ip:string,
   state:boolean,//up true down false
   name?:string,

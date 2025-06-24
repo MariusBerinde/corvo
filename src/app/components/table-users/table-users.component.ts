@@ -38,10 +38,11 @@ export class TableUsersComponent implements OnInit {
   approvedUsers: string[] = [];
   showAddEmailForm: boolean = false;
   users:Omit<User, 'pwd'>[]=[];
+  //user:any;
   newEmailControl = new FormControl('', [Validators.required, Validators.email]);
    displayedColumns: string[] = ['username', 'email', 'ruolo', 'operazioni'];
   constructor(
-    private gL: ManageLogService,
+    //private gL: ManageLogService,
     private storage: LocalWriteService,
     private auth: AuthService
   ) {}
@@ -50,25 +51,33 @@ export class TableUsersComponent implements OnInit {
     const email = this.storage.getData('email') ?? '';
     this.localMail = email;
     if (email.length > 0) {
-      const role = this.auth.getUserRole(email);
+
+      //const role = this.auth.getUserRole(email);
+      //const role = this.auth.getLoggedUser().role;
       this.approvedUsers = this.auth.getApprovedUsers() ?? [];
       this.users = this.auth.getAllUsersInfo();
+
+
     }
   }
+
+
 
   deleteMail(email: string): void {
     this.approvedUsers = this.approvedUsers.filter(u => u !== email);
     console.log(` ${email} eliminato.`);
     this.auth.removeApprovedUser(email);
   }
+
+
   deleteUser(email:string){
     this.deleteMail(email);
-    this.auth.deleteUser(email);
+    this.auth.removeApprovedUserP(email);
   }
-
   mostraFormAggiungiEmail(): void {
     this.showAddEmailForm = true;
   }
+
 
   aggiungiNuovoUtente(): void {
     if (this.newEmailControl.valid) {
@@ -87,6 +96,7 @@ export class TableUsersComponent implements OnInit {
     }
   }
 
+
   annullaAggiungiEmail(): void {
     this.showAddEmailForm = false;
     this.newEmailControl.reset();
@@ -101,8 +111,10 @@ toggleUserRole(email: string, currentRole: Role): void {
       newRole == Role.Worker;
     }
     const iEmail=this.users.findIndex(e=>e.email===email);
+    //const iEmail=this.user.findIndex(e=>e.email===email);
     if(iEmail>=0 && iEmail<this.users.length){
       this.users[iEmail].role=newRole;
+      //this.user[iEmail].role=newRole;
     }
 
     this.auth.setNewRole(email, newRole); // Chiama il servizio auth per aggiornare il ruolo

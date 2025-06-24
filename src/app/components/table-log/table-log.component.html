@@ -7,14 +7,14 @@
     <th mat-sort-header="service">Service</th>
     <th mat-sort-header="desc">Descrizione</th>
   </tr>
-  @for(log of sortedLogs; track log){
+  @for(log of sortedLogs(); track log){
   <tr>
     <td>{{log.id}}</td>
     <td>{{log.data}}</td>
-    <td>{{log.user}}</td>
-    <td>{{log.server}}</td>
+    <td>{{log.userEmail}}</td>
+    <td>{{log.ip}}</td>
     <td>{{log.service}}</td>
-    <td>{{log.desc}}</td>
+    <td>{{log.descr}}</td>
   </tr>
   }
  @empty {

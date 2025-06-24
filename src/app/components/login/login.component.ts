@@ -46,7 +46,7 @@ submitLogin() {
         this.checkCredenzialsDb()
             .then(isValid => {
                 if (isValid) {
-                    this.lS.saveData('email', this.emailI);
+                    //this.lS.saveData('email', this.emailI);
                      this._router.navigate(['../home/']);
                     console.log("Login successful!");
                 } else {
