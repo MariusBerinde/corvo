@@ -1,6 +1,6 @@
 const passwordPattern = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[\.\,\/\#\!\?\$\%\\\^\&\*\;\:\{\}\=\-\_\(\)\[\]\\\|'&|\`\~@\.])[^]{6,}$/;
 
-import { Component,OnInit,signal  } from '@angular/core';
+import { Component,OnInit} from '@angular/core';
 import { MatMenuModule } from '@angular/material/menu';
 import { MatToolbarModule } from '@angular/material/toolbar';
 import { Router, RouterModule } from '@angular/router';
@@ -20,6 +20,7 @@ import {TableLogComponent } from '../table-log/table-log.component';
 import { ManageLogService } from '../../services/manage-log.service';
 import {TableUsersComponent } from '../table-users/table-users.component'
 import { userInfo } from 'os';
+import { HttpStatusCode } from '@angular/common/http';
 @Component({
   selector: 'app-user',
   standalone: true,
@@ -133,54 +134,24 @@ ngOnInit(): void{
         this.pwdOldI = this.formResetPwd.value.pwdOld??'';
         //controllo che sia la vera vecchia oldPwd
 
-      /*
-        this.authService.checkUserPwd(this.actualUser.email,this.pwdOldI).then(
-          isValid =>{
-            if(isValid){
-              console.log("old pwd ok");
-              if(this.pwdI===this.pwdRI ){
-                if(this.pwdI!=this.pwdOldI){
-                  console.log("cambio pwd ok");
-                  this.authService.setNewPwd(this.actualUser.email,this.pwdI);
-                  //this.router.navigate(['']);
-                  this.logout();
-                }
-                else{
-                  this.errorReusedOldPwd = true;
-                }
-              } else{
-                this.errorPwdR = true;
-                }
-            }else{ this.errorInsertOldPwd = true; var tmp='vecchia pwd errata valore inserito:'+this.pwdOldI }
-          }
-        );
-      */
-        //if(this.authService.checkUserPwd1(this.actualUser().email,this.pwdOldI)){
-        if(this.authService.checkUserPwd1(this.actualUser.email,this.pwdOldI)){
-          console.log("old pwd ok");
-          if(this.pwdI===this.pwdRI ){
-            if(this.pwdI!=this.pwdOldI){
-            console.log("cambio pwd ok");
-            //this.authService.setNewPwd(this.actualUser().email,this.pwdI);
-            this.authService.setNewPwd(this.actualUser.email,this.pwdI);
-            //this.router.navigate(['']);
-            this.logout();
-            }
-            else{
-              this.errorReusedOldPwd = true;
-            }
-          } else{
-            this.errorPwdR = true;
-          }
-        }else{
-         this.errorInsertOldPwd = true;
-          var tmp='vecchia pwd errata valore inserito:'+this.pwdOldI
-          //alert(tmp);
 
+      if(this.pwdI !== this.pwdRI){
+        this.errorPwdR = true;
+      }
+      if(this.pwdI === this.pwdOldI){
+        this.errorReusedOldPwd = true;
+      }
+      this.authService.updatePwdUser(this.actualUser.email,this.pwdOldI,this.pwdI).then(
+       status => {
+          if( status === HttpStatusCode.Ok)
+            this.logout();
+          if(status === HttpStatusCode.Forbidden)
+            this.errorInsertOldPwd = true;
         }
 
-      }
+      );
 
+      }
     }
   logout() {
 

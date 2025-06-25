@@ -249,6 +249,44 @@ export class AuthService {
       return false;
     }
   }
+  updatePwdUser(email:string,oldPwd:string,newPwd:string):Promise<Number>{
+
+    const data={"email":email,"oldPassword":oldPwd,"newPassword":newPwd};
+    console.log("set New Pwd test richiesta post");
+
+    const url = `${this.API_BASE}/updatePassword`;
+    return new Promise(
+      (resolve)=>{
+        this.http.post(
+          url,data,{
+        observe: 'response'
+          }
+        ).subscribe(
+            {
+              next:(response)=>{
+                console.log("Status in update updatePwdUser =",response.status);
+                console.log("Body in updatePwdUser =",response.body);
+                /*
+                if (response.status === 200){
+                  if( response.body !== null){
+                    var msgResponse:string = response.body.toString() ;
+                    if(msgResponse ==="true")
+                      resolve();
+                  }
+                }
+                */
+                resolve(response.status)
+              },
+              error:(error)=>{
+                console.log("error in checkUserPwd =",error.status);
+
+                resolve(error.status);
+              }
+
+            })
+      }
+    );
+  }
 
   /* Delete the user account associated with the given email
    *  @param email - the user's email
