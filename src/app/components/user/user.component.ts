@@ -111,7 +111,7 @@ ngOnInit(): void{
       actualRoleUser = Role.Supervisor;
   var user:User  = {
       email:this.storage.getData('email')??'',
-      username:this.storage.getData('email')??'',
+      username:this.storage.getData('username')??'',
       pwd:'defaultPassword',
       role:actualRoleUser
     };

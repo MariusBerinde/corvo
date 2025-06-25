@@ -10,6 +10,7 @@ import {LocalWriteService} from './local-write.service';
 })
 export class ManageLogService {
 
+  private readonly API_BASE = 'http://localhost:8083';
   protected listaLog:Log[]=[{
     "id":0,
     "data":"Mon May 05 2025 10:48:30 GMT+0200 (Ora legale dell’Europa centrale)",
@@ -83,7 +84,6 @@ export class ManageLogService {
   ];
   email:string='';
   constructor(
-
     private storage:LocalWriteService,
     private http:HttpClient
   ) {

@@ -14,6 +14,9 @@ export class AuthService {
   actualUsername:string='';
   private loggedUser:any = null ;
   private readonly API_BASE = 'http://localhost:8083';
+  private approvedUsersSb = new BehaviorSubject<string[]>([]);
+  public approvedUsers$ = this.approvedUsersSb.asObservable();
+
 
   tmpUsers:User[]=[
     {
@@ -373,7 +376,7 @@ export class AuthService {
    * @returns An array of strings, where each string is the identifier
    * (e.g., username, user ID) of an approved user. Returns an empty
    * array if no users are currently approved.
-   */
+*/
   getApprovedUsers():string[]{
   return this.approvedUsers;
   }
@@ -401,43 +404,6 @@ export class AuthService {
   }
 
 
-  removeApprovedUserP(email:string):Promise<boolean>{
-
-    const data = { "username":this.actualUsername,"email": email};
-
-    console.log("dentro removeApprovedUserP");
-    const url = 'http://localhost:8083/deleteEnabledUser';
-
-    return new Promise((resolve) => {
-      this.http.post(url, data, {
-        observe: 'response'
-      }).subscribe({
-          next: (response) => {
-            console.log("Status in removeApprovedUserP =", response.status);
-            console.log("Body in removeApprovedUserP  =", response.body);
-
-            // Email approvata solo se status è 200
-            resolve(response.status === 200);
-          },
-          error: (error) => {
-            console.log("Error in isEmailApproved2 - Status =", error.status);
-
-            // Gestisci i diversi casi di errore
-            if(error.status === 200)
-              resolve(true)
-            if (error.status === 404) {
-              console.log("Email non trovata nella lista approvate");
-            } else if (error.status === 400) {
-              console.log("Richiesta malformata");
-            } else {
-              console.log("Errore generico:", error);
-            }
-
-            resolve(false);
-          }
-        });
-    });
-  }
 /**
  * Updates the role of a user identified by their email address.
  * @param email - The email address of the user whose role is to be updated.
@@ -525,4 +491,81 @@ getAllUsersInfo(): Omit<User, 'pwd'>[] {
 
   }
 
+  getApprovedUsersO(username:string):Observable<string[]>{
+
+    const url = `${this.API_BASE}/getApprovedUsers`;
+
+    console.log("getApprovedUsersO: username=",username);
+    const headers = new HttpHeaders({
+      'Content-Type': 'application/json',
+      'username': username
+    });
+
+    return this.http.get<string[]>(url,{headers}).pipe(
+      tap((users)=>{
+        this.approvedUsersSb.next(users);
+      }),
+      catchError(this.handleError)
+    );
+
+  }
+  enableUserRegistration(email: string): Observable<any> {
+    var username = this.storage.getData("username")??"";
+    const body = { "username": "lol", "email": email } ;
+
+    const url = `${this.API_BASE}/enableUserRegistration`;
+    return this.http.post<any>(url, body)
+      .pipe(
+        tap(() => {
+          // Aggiorna la lista locale aggiungendo il nuovo utente
+          const currentUsers = this.approvedUsersSb.value;
+          if (!currentUsers.includes(email)) {
+            this.approvedUsersSb.next([...currentUsers, email]);
+          }
+        }),
+        catchError(this.handleError)
+      );
+  }
+
+  deleteEnabledUser(email: string): Observable<number> {
+    var username = this.storage.getData("username") ?? "";
+    const body = { "username": username, "email": email };
+    console.log("body of deleteEnabledUser username=", body.username);
+    console.log("body of deleteEnabledUser email=", body.email);
+    const url = `${this.API_BASE}/deleteEnabledUser`;
+
+    return this.http.post<number>(url, body)
+      .pipe(
+        tap((deletedItems) => {
+          console.log("Elementi cancellati dal server:", deletedItems);
+          if (deletedItems > 0) {
+            // Aggiorna la lista locale solo se la cancellazione è riuscita
+            const currentUsers = this.approvedUsersSb.value;
+            const updatedUsers = currentUsers.filter(user => user !== email);
+            this.approvedUsersSb.next(updatedUsers);
+            console.log("Lista aggiornata nel service:", updatedUsers);
+          }
+        }),
+        catchError(this.handleError)
+      );
+  }
+ getCurrentApprovedUsers(): string[] {
+    return this.approvedUsersSb.value;
+  }
+
+  private handleError(error:any):Observable<never>{
+    console.error("problema con approved users:",error);
+    let errorMsg = "errore sconosciuto";
+    if(error.error instanceof ErrorEvent){
+      errorMsg = `Errore ${error.error.message}`;
+    }else{
+
+      errorMsg = `Errore ${error.status}:${error.message}`
+    }
+    return throwError(()=>new Error(errorMsg));
+  }
+
+  isUserApproved(email: string): boolean {
+    return this.approvedUsersSb.value.includes(email);
+  }
 }
