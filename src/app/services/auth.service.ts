@@ -4,18 +4,26 @@ import * as bcrypt from 'bcryptjs';
 import {ManageLogService } from './manage-log.service';
 import {LocalWriteService} from './local-write.service';
 import {HttpClient,HttpHeaders } from '@angular/common/http';
-import { BehaviorSubject,  Observable,  throwError } from 'rxjs';
-
+import { BehaviorSubject,  Observable,map, throwError } from 'rxjs';
 import { catchError, tap, switchMap } from 'rxjs/operators';
+
+interface ServerUser {
+  email: string;
+  username: string;
+  password: null;
+  role: 'SUPERVISOR' | 'WORKER';
+}
+
 @Injectable({
   providedIn: 'root'
 })
 export class AuthService {
-  actualUsername:string='';
+  private actualUsername:string='';
   private loggedUser:any = null ;
   private readonly API_BASE = 'http://localhost:8083';
   private approvedUsersSb = new BehaviorSubject<string[]>([]);
   public approvedUsers$ = this.approvedUsersSb.asObservable();
+
 
 
   tmpUsers:User[]=[
@@ -46,9 +54,10 @@ export class AuthService {
     private http:HttpClient
   ) {
     const localEmail:string  = this.storage.getData('email')??'';
+
     if(localEmail.length>0){
 
-      const username = this.getUserName(localEmail)??'';
+      const username = this.storage.getData("username")??'';
       if(username.length>0)
         this.actualUsername = username;
     }
@@ -81,7 +90,7 @@ export class AuthService {
 
     const data={"email":email,"password":pwd};
     console.log("test richiesta post");
-    const url = 'http://localhost:8083/authUser';
+    const url = `${this.API_BASE}/authUser`;
     return new Promise(
       (resolve) => {
         this.http.post(
@@ -491,6 +500,10 @@ getAllUsersInfo(): Omit<User, 'pwd'>[] {
 
   }
 
+  /**
+  * @param username the name of the user who will take from the server the list of mails of the users approved for the registration
+  *
+  */
   getApprovedUsersO(username:string):Observable<string[]>{
 
     const url = `${this.API_BASE}/getApprovedUsers`;
@@ -509,6 +522,9 @@ getAllUsersInfo(): Omit<User, 'pwd'>[] {
     );
 
   }
+  /**
+  * used for push the user's email in the list of the registrable users on the server
+  */
   enableUserRegistration(email: string): Observable<any> {
     var username = this.storage.getData("username")??"";
     const body = { "username": "lol", "email": email } ;
@@ -568,4 +584,104 @@ getAllUsersInfo(): Omit<User, 'pwd'>[] {
   isUserApproved(email: string): boolean {
     return this.approvedUsersSb.value.includes(email);
   }
+
+  getAllUsersInfoO(username:string):Observable<Omit<User, 'pwd'>[]>{
+
+    const url = `${this.API_BASE}/getAllUsers`;
+
+    console.log("getApprovedUsersO: username=",username);
+    const headers = new HttpHeaders({
+      'Content-Type': 'application/json',
+      'username': username
+    });
+return this.http.get<ServerUser[]>(url, { headers }).pipe(
+      map(serverUsers => serverUsers.map(this.mapServerUserToClientUser.bind(this)))
+    );
+
+  }
+
+
+  private mapServerUserToClientUser(serverUser: ServerUser): Omit<User, 'pwd'> {
+    return {
+      email: serverUser.email,
+      username: serverUser.username,
+      role: this.mapServerRoleToEnum(serverUser.role)
+    };
+  }
+
+  private mapServerRoleToEnum(serverRole: 'SUPERVISOR' | 'WORKER'): Role {
+    return serverRole === 'SUPERVISOR' ? Role.Supervisor : Role.Worker;
+  }
+
+
+  /**  Updates the role of the user with the data  email
+  * @argument email the email of the user that will be updated
+  * @argument role the new role for the user
+  */
+  updateUserRole( email:string,newRole:Role):Promise<boolean>{
+
+    const data= {
+      "username": "lol",
+      "user": {
+        "email": email,
+        "role": newRole
+      }
+    }
+
+    const url = `${this.API_BASE}/updateRoleUser`;
+    return new Promise( (resolve) => { this.http.post( url,data,{ observe: 'response' }).
+      subscribe( {
+        next:(response)=>{
+                console.log("Status in updateUserRole =",response.status);
+                console.log("Body in updateUserRole =",response.body);
+                if (response.status === 200)
+                  if( response.body !== null)
+                  this.loggedUser = response.body;
+
+                resolve(response.status === 200);
+              },
+              error:(error)=>{
+                if(error.status==200) resolve(true);
+
+                console.log("error in checkUserPwd =",error.status);
+                resolve(false);
+              }
+
+            });
+
+      });
+  }
+
+  deleteUserP(email:string):Promise<boolean>{
+      const data = { 'username': this.actualUsername , 'email': email};
+      const url = `${this.API_BASE}/deleteUser`
+  // === DEBUG STAMPE ===
+    console.log("=== DELETE USER DEBUG ===");
+    console.log("🎯 URL:", url);
+    console.log("📦 Payload inviato al server:", JSON.stringify(data, null, 2));
+    console.log("👤 actualUsername:", data.username);
+    console.log("📧 email parametro:", data.email);
+    console.log("========================");
+    return new Promise( (resolve) => { this.http.post( url,data,{ observe: 'response' }).
+      subscribe( {
+        next:(response)=>{
+                console.log("Status in deleteUserP =",response.status);
+                console.log("Body in deleteUserP  =",response.body);
+                if (response.status === 200)
+                  //this.loggedUser = response.body;
+
+                resolve(response.status === 200);
+              },
+              error:(error)=>{
+                if(error.status==200) resolve(true);
+
+                console.log("error in deleteUserP =",error.status);
+                resolve(false);
+              }
+
+            });
+
+      });
+  }
+
 }

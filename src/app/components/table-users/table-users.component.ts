@@ -45,6 +45,7 @@ export class TableUsersComponent implements OnInit {
    displayedColumns: string[] = ['username', 'email', 'ruolo', 'operazioni'];
 
   isLoadingApprovedUsers = false;
+  isLoadingUsers = false;
   approvedUsersError: string | null = null;
 
   private destroy$ = new Subject<void>(); // NUOVO per gestire unsubscribe
@@ -62,7 +63,8 @@ export class TableUsersComponent implements OnInit {
       //const role = this.auth.getUserRole(email);
       //const role = this.auth.getLoggedUser().role;
       this.loadApprovedUsers();
-      this.users = this.auth.getAllUsersInfo();
+      this.loadAllUsers();
+      //this.users = this.auth.getAllUsersInfo();
 
     }
   }
@@ -92,6 +94,26 @@ export class TableUsersComponent implements OnInit {
 
   }
 
+  private loadAllUsers():void{
+    this.isLoadingUsers = true;
+    const localUsername = this.storage.getData("username")??"";
+    this.auth.getAllUsersInfoO(localUsername).pipe(
+      takeUntil(this.destroy$),
+      finalize(() => this.isLoadingUsers = false)
+    ).subscribe(
+        {
+          next: (users)=>{
+            console.log("loading data with getAllUsersInfoO");
+            this.users = users;
+          },
+          error : (error)=> {
+            console.error("problem with loading data from getAllUsersInfoO")
+          }
+        }
+      );
+
+  }
+
 
 
 
@@ -109,7 +131,6 @@ deleteMail(email: string): void {
   this.approvedUsersError = null;
   console.log("Provo a cancellare la mail:", email);
 
-  // CORREZIONE: passa 'email' invece di 'this.localMail'
   this.auth.deleteEnabledUser(email).pipe(
     takeUntil(this.destroy$),
     finalize(() => this.isLoadingApprovedUsers = false)
@@ -137,10 +158,28 @@ deleteMail(email: string): void {
 }
 
 
+  /*
   deleteUser(email:string){
     this.deleteMail(email);
     this.auth.removeApprovedUser(email);
   }
+  */
+
+  deleteUser(email:string):void{
+    console.log("Delete user email=",email);
+    this.auth.deleteUserP(email).then(
+      (status)=>{
+        if(status){
+          console.log("delete user ok in table-users");
+
+          this.loadAllUsers();
+            this.deleteMail(email);
+
+        }
+      }
+    );
+  }
+
   mostraFormAggiungiEmail(): void {
     this.showAddEmailForm = true;
   }
@@ -205,6 +244,9 @@ deleteMail(email: string): void {
   reloadApprovedUsers(): void {
     this.loadApprovedUsers();
   }
+  reloadAllUsers():void{
+    this.loadAllUsers();
+  }
 
   annullaAggiungiEmail(): void {
     this.showAddEmailForm = false;
@@ -219,14 +261,23 @@ toggleUserRole(email: string, currentRole: Role): void {
     if(currentRole==Role.Supervisor){
       newRole == Role.Worker;
     }
-    const iEmail=this.users.findIndex(e=>e.email===email);
-    //const iEmail=this.user.findIndex(e=>e.email===email);
-    if(iEmail>=0 && iEmail<this.users.length){
-      this.users[iEmail].role=newRole;
-      //this.user[iEmail].role=newRole;
-    }
 
-    this.auth.setNewRole(email, newRole); // Chiama il servizio auth per aggiornare il ruolo
+    this.auth.updateUserRole(email,newRole).then(
+      (value)=>{
+        if(value){
+          console.log("user role changed with success");
+
+          const iEmail=this.users.findIndex(e=>e.email===email);
+          if(iEmail>=0 && iEmail<this.users.length){
+            this.users[iEmail].role=newRole;
+            //this.user[iEmail].role=newRole;
+          }
+
+        }
+      }
+    );
+
+    //this.auth.setNewRole(email, newRole); // Chiama il servizio auth per aggiornare il ruolo
   }
 
 }
