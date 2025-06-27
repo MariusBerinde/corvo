@@ -16,6 +16,8 @@ import { ManageServerService } from '../../services/manage-server.service';
 import { ManageLogService } from '../../services/manage-log.service';
 import { Server } from '../../interfaces/server';
 import { HomeComponent } from '../home/home.component';
+
+import { finalize, Subject ,takeUntil } from 'rxjs';
 @Component({
   selector: 'app-detail-server',
   imports: [
@@ -43,12 +45,17 @@ export class DetailServerComponent implements OnInit{
 ;
   activeRulesList:Rule[]=[];
   errorNetwork:boolean=false;
+  isLoadingRules = false;
+  activeRulesError : string | null = null;
+
+  private destroy$ = new Subject<void>(); // NUOVO per gestire unsubscribe
 
     generalRules:Rule[]=[] ;
     rulesDB:Rule[]=[];
     rulesDocker:Rule[]=[];
     rulesHa:Rule[]=[];
     actualUser:string='';
+
   constructor(
     private router: Router,
     private inRoute:ActivatedRoute,
@@ -66,8 +73,10 @@ export class DetailServerComponent implements OnInit{
      this.activeRulesList = this.mR.getRulesByIp(this.ip);
 
      this.localServer = this.mServer.getServerByIp(this.ip);
-     this.activeRulesList = this.mR.getRulesByIp(this.ip);
+     //this.activeRulesList = this.mR.getRulesByIp(this.ip);
      this.actualUser = this.storage.getData('email')??'';
+      this.loadActiveRules();
+
 
      this.log.setLog(this.actualUser,"Corvo:visione status server="+this.ip);
      if(this.localServer.id===-1){
@@ -86,6 +95,33 @@ export class DetailServerComponent implements OnInit{
 
    }
  }
+
+  /**
+  * load rules from database using getRulesByIpO method
+  */
+  private loadActiveRules():void{
+    this.isLoadingRules = true;
+    this.activeRulesError = null;
+
+    this.mR.getRulesByIpO(this.ip??"").pipe(
+      takeUntil(this.destroy$),
+      finalize(()=>this.isLoadingRules = false)
+    ).subscribe({
+        next:(rules)=>{
+          this.activeRulesList = rules;
+          console.log("Detail Server: Loading Active rules from database");
+        },
+        error : (error)=>{
+          console.error("Detail Server:problem with loading data from database")
+          // fallback
+          this.activeRulesList = this.mR.getRulesByIp(this.ip??"");
+
+        }
+      })
+  }
+  reloadActiveRules():void{
+    this.loadActiveRules();
+  }
 logout() {
   this.log.setLog(this.actualUser,"Corvo:logout da detail server");
     this.storage.clearData();

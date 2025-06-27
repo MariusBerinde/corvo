@@ -5,6 +5,7 @@ import {HttpClient,HttpHeaders,HttpErrorResponse,HttpResponse } from '@angular/c
 import { retry, catchError,map } from 'rxjs/operators';
 import {LocalWriteService} from './local-write.service';
 
+import { HttpStatusCode } from '@angular/common/http';
 @Injectable({
   providedIn: 'root'
 })
@@ -93,15 +94,19 @@ export class ManageLogService {
       if(localEmail.length>0)
         this.email = localEmail;
   }
-  /* Returns all the log from the database
+  /* Returns all the logs from the database
    */
   getAllLogs():Log[]{
     return this.listaLog;
   }
 
+  /**
+   *  Returns all the logs from the database using Observable.
+   *  The REST request needs username parameter (technically is the email address)
+   */
   public getAllLogsO():Observable<Log[]>{
 
-    const url = 'http://localhost:8083/getAllLogs';
+    const url = `${this.API_BASE}/getAllLogs`;
     const headers = new HttpHeaders({
       'Content-Type': 'application/json',
       'username': this.email
@@ -121,11 +126,12 @@ export class ManageLogService {
   console.error('Errore API:', error);
 
   let errorMessage = 'Errore sconosciuto';
-  if (error.status === 0) {
+  if (error.status === 0 ) {
     errorMessage = 'Errore di connessione al server';
-  } else if (error.status >= 400 && error.status < 500) {
+  //} else if (error.status >= 400 && error.status < 500) {
+  } else if (error.status >= HttpStatusCode.BadRequest && error.status < HttpStatusCode.InternalServerError) {
     errorMessage = 'Errore nella richiesta';
-  } else if (error.status >= 500) {
+  } else if (error.status >= HttpStatusCode.InternalServerError) {
     errorMessage = 'Errore del server';
   }
 
@@ -137,9 +143,9 @@ export class ManageLogService {
  * @param email - The email address of the user
  * @returns An array of Log objects associated with the user (may be empty)
  */
-getUserLog(email: string): Log[] {
-  console.log("email ricevuta =",email);
-  const userLogs = this.listaLog.filter(log => log.userEmail === email);
+  getUserLog(email: string): Log[] {
+    console.log("email ricevuta =",email);
+    const userLogs = this.listaLog.filter(log => log.userEmail === email);
 
     /*
   if (userLogs.length > 1) {
@@ -150,17 +156,22 @@ getUserLog(email: string): Log[] {
     return []; // Restituisce il vettore vuoto se non trova log per l'email
   }
   */
-  if(userLogs.length>=1){
+    if(userLogs.length>=1){
       return userLogs;
     }
     else{
       return [];
     }
 
-}
- getUserLogO(email: string){
+  }
 
-    const url = 'http://localhost:8083/getUserLogs';
+
+  /**
+   * returns the logs of the user that is identified with the param email
+   */
+  getUserLogO(email: string){
+
+    const url = `${this.API_BASE}/getUserLogs`;
     const headers = new HttpHeaders({
       'Content-Type': 'application/json',
       'email': this.email
@@ -171,14 +182,14 @@ getUserLog(email: string): Log[] {
       headers: headers,
       observe: 'response'
     }).pipe(
-      map((response: HttpResponse<Log[]>) => response.body!),
-      retry(2),
-      catchError(this.handleError)
-    );
+        map((response: HttpResponse<Log[]>) => response.body!),
+        retry(2),
+        catchError(this.handleError)
+      );
   }
 
 
-  /**
+  /*
   * create a log with user,descr,server,service as params
   * @ param string - the email of the user
   * @ descr string - a string that describe the event

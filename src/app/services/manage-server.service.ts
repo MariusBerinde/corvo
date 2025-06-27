@@ -4,6 +4,7 @@ import {HttpClient,HttpHeaders,HttpErrorResponse,HttpResponse } from '@angular/c
 import {LocalWriteService} from './local-write.service';
 import { Observable, throwError } from 'rxjs';
 import { retry, catchError,map } from 'rxjs/operators';
+import { HttpStatusCode } from '@angular/common/http';
 @Injectable({
   providedIn: 'root'
 })
@@ -39,6 +40,7 @@ export class ManageServerService {
   ];
 
   email:string='';
+  private readonly API_BASE = 'http://localhost:8083';
   constructor(
     private storage:LocalWriteService,
     private http:HttpClient
@@ -61,7 +63,7 @@ export class ManageServerService {
   }
 
 public getAllServersO(): Observable<Server[]> {
-  const url = 'http://localhost:8083/getAllServers';
+  const url = `${this.API_BASE}/getAllServers`;
   const headers = new HttpHeaders({
     'Content-Type': 'application/json',
     'email': this.email
@@ -82,9 +84,9 @@ public getAllServersO(): Observable<Server[]> {
   let errorMessage = 'Errore sconosciuto';
   if (error.status === 0) {
     errorMessage = 'Errore di connessione al server';
-  } else if (error.status >= 400 && error.status < 500) {
+  } else if (error.status >= HttpStatusCode.BadRequest  && error.status < HttpStatusCode.InternalServerError) { //BadRequest = 400 and 500 iternal error
     errorMessage = 'Errore nella richiesta';
-  } else if (error.status >= 500) {
+  } else if (error.status >= HttpStatusCode.InternalServerError) {
     errorMessage = 'Errore del server';
   }
 
