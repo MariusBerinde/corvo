@@ -29,7 +29,7 @@
     <mat-expansion-panel-header>
       <mat-panel-title>Report  </mat-panel-title>
     </mat-expansion-panel-header>
-        <report-view></report-view>
+        <report-view [ip]="ip"> </report-view>
   </mat-expansion-panel>
 </mat-accordion>
     <br>
@@ -54,6 +54,8 @@
         <span class="spacer"></span>
         <span class="spacer"></span>
         <button mat-raised-button (click)="testDialog()">Aggiungi regola da disabilitare</button>
+        <span class="spacer"></span>
+        <button mat-raised-button (click)="saveSkippedList()">Salva configurazione</button>
   </mat-expansion-panel>
 </mat-accordion>
   </mat-card-content>

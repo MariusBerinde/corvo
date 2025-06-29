@@ -41,8 +41,6 @@ submitLogin() {
 
         console.log("Form valido - Email:", this.emailI);
 
-        this.auth.testPost(this.emailI);
-
         this.checkCredenzialsDb()
             .then(isValid => {
                 if (isValid) {

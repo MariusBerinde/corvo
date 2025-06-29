@@ -16,6 +16,8 @@ import {MatExpansionModule} from '@angular/material/expansion';
 import { LynisRulesComponent } from './lynis-rules/lynis-rules.component';
 import { ReportViewComponent   } from '../report-view/report-view.component';
 import { HttpClientModule } from '@angular/common/http';
+
+import { finalize, Subject ,takeUntil } from 'rxjs';
 @Component({
   selector: 'app-lynis',
   imports: [
@@ -43,6 +45,12 @@ export class LynisComponent implements OnInit{
   risDialog:string[]=[];
   ip:string = '';
   dialog = inject(MatDialog);
+  isLoadingConfig = false;
+  loadingConfigError : string | null = null;
+
+  private destroy$ = new Subject<void>(); // NUOVO per gestire unsubscribe
+
+//  @Input() private ip:string = "";
 
   constructor(
     private router: Router,
@@ -59,7 +67,31 @@ export class LynisComponent implements OnInit{
     this.descTest = this.lynis.getSkippableTestList();
     this.mini = this.descTest.slice(0,20);
     this.ip = this.inRoute.snapshot.paramMap.get('ip')??'errore navigazione';
-    this.acutalConfig=this.lynis.getActualConfig(this.ip);
+    //this.acutalConfig=this.lynis.getActualConfig(this.ip);
+    this.loadLynisConfig();
+  }
+
+
+  loadLynisConfig():void{
+    this.isLoadingConfig = true;
+    this.loadingConfigError = null;
+    this.lynis.getActualConfigO(this.ip).pipe(
+      takeUntil(this.destroy$),
+      finalize(()=>this.isLoadingConfig  = false)
+    ).subscribe({
+        next:(config)=>{
+          this.acutalConfig = config;
+          console.log("Loading config of lynis from the db");
+        },
+        error:(error)=>{
+
+          console.log("Loading config of lynis from the db errol , load the mock data");
+          this.acutalConfig = this.lynis.getActualConfig(this.ip);
+
+          //TODO:continue from here
+        }
+      })
+
   }
   loadUserName(): string {
     const email = this.storage.getData('email') ?? 'default';
@@ -99,6 +131,7 @@ testDialog() {
       console.log("Dialog chiuso");
       if (ris !== undefined && ris.length > 0) {
         this.acutalConfig.listIdSkippedTest = ris;
+        //this.lynis.addLynisConfig(ris,this.ip);
         console.log("Elementi ricevuti dal dialog:", ris);
         console.log("listIdSkippedTest aggiornato:", this.acutalConfig.listIdSkippedTest);
         this.cdr.detectChanges(); // Forza l'aggiornamento della vista
@@ -109,6 +142,21 @@ testDialog() {
     //console.log("Valore di listIdSkippedTest dopo subscribe (prima della chiusura del dialog):", this.acutalConfig.listIdSkippedTest);
   }
 
+  saveSkippedList(){
+    this.lynis.addLynisConfig(this.acutalConfig.listIdSkippedTest,this.ip).then(
+      isValid => {
+        if (isValid)
+          console.log("addLynisConfig added to db ");
+        else
+          console.log("addLynisConfig not added to db ");
+
+
+      }
+    );
+
+
+
+  }
 
   navigateToHome(){
     this.router.navigate(['home']);

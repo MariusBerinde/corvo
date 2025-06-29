@@ -1,5 +1,10 @@
 import { Injectable } from '@angular/core';
 import { LynisTest,Lynis } from '../interfaces/lynis';
+import {ManageLogService } from './manage-log.service';
+import {LocalWriteService} from './local-write.service';
+import {HttpClient,HttpHeaders } from '@angular/common/http';
+import { BehaviorSubject,  Observable,map, throwError } from 'rxjs';
+import { catchError, tap, switchMap } from 'rxjs/operators';
 
 @Injectable({
   providedIn: 'root'
@@ -528,7 +533,23 @@ protected listConfigs:Lynis[] = [
       "listIdSkippedTest":[]
   },
   ];
-  constructor() { }
+
+  private actualUsername:string='';
+  private readonly API_BASE = 'http://localhost:8083';
+  private lynisConfigSb = new BehaviorSubject<Lynis | null>(null);
+
+  public lynisConfig$ = this.lynisConfigSb.asObservable();
+
+  constructor(
+    private log:ManageLogService,
+    private storage:LocalWriteService,
+    private http:HttpClient
+  ) {
+
+      const username = this.storage.getData("username")??'';
+      if(username.length>0)
+        this.actualUsername = username;
+  }
 /**
  * Retrieves the list of Lynis tests that can be skipped.
  * @returns An array of skippable LynisTest objects.
@@ -570,6 +591,40 @@ protected listConfigs:Lynis[] = [
 
     return  localConfig;
   }
+
+  getActualConfigO(ip:string):Observable<Lynis>{
+
+    const url = `${this.API_BASE}/getLynisByIp`;
+    const body = {
+
+      "username": this.actualUsername,
+      "ip":ip
+    }
+
+    return this.http.post<Lynis>(url,body).pipe(
+
+      tap((config)=>{
+        this.lynisConfigSb .next(config);
+      }),
+      catchError(this.handleError)
+    )
+
+  }
+
+
+  private handleError(error:any):Observable<never>{
+    console.error("problema con getActualConfigO lynis :",error);
+    let errorMsg = "errore sconosciuto";
+    if(error.error instanceof ErrorEvent){
+      errorMsg = `Errore ${error.error.message}`;
+    }else{
+
+      errorMsg = `Errore ${error.status}:${error.message}`
+    }
+    return throwError(()=>new Error(errorMsg));
+  }
+
+
 /**
  * Retrieves the list of IDs of the tests that have been skipped in the current configuration.
  * @returns An array of test ID strings that were skipped.
@@ -578,5 +633,63 @@ protected listConfigs:Lynis[] = [
     const localConfig = this.listConfigs.find(c => c.ip===ip);
     return localConfig?.listIdSkippedTest??[];
   }
+
+  getSkippedTestsO():string[]|null{
+    const config = this.lynisConfigSb.value;
+    return config ? config.listIdSkippedTest : null;
+
+  }
+
+  /**
+   * add the list of skipped ids to lynis config of the IP machine
+   */
+  addLynisConfig(listOfTest:string[],ip:string):Promise<Boolean>{
+
+    const url = `${this.API_BASE}/addLynisConfig`;
+    console.log()
+    const body = {
+      "username":this.actualUsername,
+      "lynis": {
+        "ip": ip,
+        "auditor": this.actualUsername,
+        "listIdSkippedTest":listOfTest
+      }
+    }
+
+    console.log("=== ADDLYNISCONFIG ===");
+    console.log("🎯 URL:", url);
+    console.log("📦 Payload inviato al server:", JSON.stringify(body, null, 2));
+    console.log("👤 actualUsername:", body.username);
+    console.log("📧 email parametro:", body.lynis.ip);
+    console.log("📧 email parametro:", body.lynis.auditor);
+    console.log("📧 email parametro:", body.lynis.listIdSkippedTest);
+    console.log("========================");
+    return new Promise(
+      (resolve) => {
+        this.http.post(
+          url,body,{
+        observe: 'response'
+          }
+
+        ).subscribe(
+            {
+              next:(response)=>{
+                console.log("Status in addLynisConfig =",response.status);
+                console.log("Body in addLynisConfig =",response.body);
+
+                resolve(response.status === 200);
+              },
+              error:(error)=>{
+                console.log("error in addLynisConfig =",error.status);
+                resolve(false);
+              }
+
+            });
+
+      });
+
+  }
+
+
 
 }

@@ -7,5 +7,5 @@ export interface Lynis {
   id:number,
   auditor:string,
   ip:string,
-  listIdSkippedTest:string[]
+  listIdSkippedTest:string[],
 }

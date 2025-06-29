@@ -130,10 +130,9 @@ private listaRegole:Rule[]=[
   }
 
 
-  //TODO:implement rest request with promise
 
   /**
-  *
+  * Version of getRules that get data from the database
   *
   */
   getRulesByIpO(ip:String):Observable<Rule []>{

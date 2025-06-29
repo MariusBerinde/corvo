@@ -69,6 +69,7 @@ export class DetailServerComponent implements OnInit{
 
  ngOnInit(): void{
    this.ip = this.inRoute.snapshot.paramMap.get('ip');
+    console.log("detail-server ip selected in on-init = ",this.ip);
    if(this.ip !== null && this.ip.length>0){
      this.activeRulesList = this.mR.getRulesByIp(this.ip);
 
@@ -79,10 +80,13 @@ export class DetailServerComponent implements OnInit{
 
 
      this.log.setLog(this.actualUser,"Corvo:visione status server="+this.ip);
+      /*
      if(this.localServer.id===-1){
        alert("Problema di rete sarai disconnesso");
        this.logout();
      }
+     */
+
 
      if(this.activeRulesList.length>0){
        this.generalRules = this.activeRulesList.filter(obj=>!('service' in obj));
@@ -102,6 +106,7 @@ export class DetailServerComponent implements OnInit{
   private loadActiveRules():void{
     this.isLoadingRules = true;
     this.activeRulesError = null;
+    console.log("selected ip = ",this.ip)
 
     this.mR.getRulesByIpO(this.ip??"").pipe(
       takeUntil(this.destroy$),
@@ -109,7 +114,8 @@ export class DetailServerComponent implements OnInit{
     ).subscribe({
         next:(rules)=>{
           this.activeRulesList = rules;
-          console.log("Detail Server: Loading Active rules from database");
+          console.log("Detail Server: Loading Active rules from database ");
+          console.log("Detail Server: deltail rules ",rules);
         },
         error : (error)=>{
           console.error("Detail Server:problem with loading data from database")
