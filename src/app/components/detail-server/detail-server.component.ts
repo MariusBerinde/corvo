@@ -16,18 +16,28 @@ import { ManageServerService } from '../../services/manage-server.service';
 import { ManageLogService } from '../../services/manage-log.service';
 import { Server } from '../../interfaces/server';
 import { HomeComponent } from '../home/home.component';
-
+import { FormsModule } from '@angular/forms';
+import { MatFormFieldModule } from '@angular/material/form-field';
+import { MatInputModule } from '@angular/material/input';
+import { MatSnackBarModule } from '@angular/material/snack-bar';
 import { finalize, Subject ,takeUntil } from 'rxjs';
+import { CommonModule } from '@angular/common'; // ✅ NgIf, NgFor, etc.
+import { MatError } from '@angular/material/form-field'; // ✅ <mat-error>
+import { MatHint } from '@angular/material/form-field'; // ✅ <mat-hint>
 @Component({
   selector: 'app-detail-server',
   imports: [
+   CommonModule,
+    FormsModule,
     MatMenuModule ,
     MatToolbarModule,
     MatIconModule,
     MatButtonModule,
     MatCardModule,
     MatListModule,
-    RouterModule
+    RouterModule,
+    MatFormFieldModule,
+    MatInputModule,
   ],
   templateUrl: './detail-server.component.html',
   styleUrl: './detail-server.component.css'
@@ -55,11 +65,19 @@ export class DetailServerComponent implements OnInit{
     rulesDocker:Rule[]=[];
     rulesHa:Rule[]=[];
     actualUser:string='';
+    newName:string|null=null;
+    newDescr:string|null=null;
+    isEditingName = false;
+    isEditingDescr = false;
+    isSaving = false;
+    hasChanges = false;
 
+
+  successMessage: string | null = null;
+  errorMessage: string | null = null;
   constructor(
     private router: Router,
     private inRoute:ActivatedRoute,
-    private mS:ManageServiceService ,
     private mR:ManageRuleService,
     private storage: LocalWriteService,
     private mServer:ManageServerService,
@@ -73,11 +91,12 @@ export class DetailServerComponent implements OnInit{
    if(this.ip !== null && this.ip.length>0){
      this.activeRulesList = this.mR.getRulesByIp(this.ip);
 
-     this.localServer = this.mServer.getServerByIp(this.ip);
+     this.localServer = this.mServer.getServerByIpO(this.ip);
      //this.activeRulesList = this.mR.getRulesByIp(this.ip);
      this.actualUser = this.storage.getData('email')??'';
       this.loadActiveRules();
-
+      this.newName = this.localServer.name??"";
+      this.newDescr = this.localServer.descr??"";
 
      this.log.setLog(this.actualUser,"Corvo:visione status server="+this.ip);
       /*
@@ -138,5 +157,58 @@ logout() {
   }
   navigateToHome(){
     this.router.navigate(['home']);
+  }
+
+  enableEdit(field: 'name' | 'descr') {
+    if (field === 'name') this.isEditingName = true;
+    if (field === 'descr') this.isEditingDescr = true;
+    this.checkForChanges();
+  }
+
+  onInputChange() {
+    this.checkForChanges();
+  }
+
+  checkForChanges() {
+    this.hasChanges =
+      this.newName !== this.localServer.name ||
+        this.newDescr !== this.localServer.descr;
+  }
+
+  async saveChanges(): Promise<void> {
+    if (!this.hasChanges || !this.ip) return;
+
+    this.isSaving = true;
+    this.errorMessage = null;
+    this.successMessage = null;
+
+    const nameToUpdate = this.newName !== this.localServer.name ? this.newName : null;
+    const descrToUpdate = this.newDescr !== this.localServer.descr ? this.newDescr : null;
+
+    try {
+      await this.mServer.updateIpWithReject(this.ip, nameToUpdate, descrToUpdate);
+
+      if (nameToUpdate) this.localServer.name = this.newName!;
+      if (descrToUpdate) this.localServer.descr = this.newDescr!;
+
+      this.successMessage = 'Modifiche salvate con successo ✔️';
+      this.isEditingName = false;
+      this.isEditingDescr = false;
+      this.hasChanges = false;
+    } catch (err: any) {
+      this.errorMessage = err.message || 'Errore durante il salvataggio';
+    } finally {
+      this.isSaving = false;
+    }
+  }
+
+  cancelEdit(): void {
+    this.newName = this.localServer.name??"";
+    this.newDescr = this.localServer.descr??"";
+    this.isEditingName = false;
+    this.isEditingDescr = false;
+    this.hasChanges = false;
+    this.errorMessage = null;
+    this.successMessage = null;
   }
 }

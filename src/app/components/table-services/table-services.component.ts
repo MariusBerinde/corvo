@@ -3,6 +3,8 @@ import { Service } from '../../interfaces/service';
 import { ManageServiceService } from '../../services/manage-service.service'
 import { Sort, MatSortModule } from '@angular/material/sort';
 
+import { finalize, Subject ,takeUntil } from 'rxjs';
+
 @Component({
   selector: 'table-services',
   imports: [MatSortModule],
@@ -12,16 +14,49 @@ import { Sort, MatSortModule } from '@angular/material/sort';
 export class TableServicesComponent implements OnInit {
   @Input() ip:string='';
   serviceList:Service[]=[];
+  isLoading = false;
+  loadingError : string | null = null;
+
+
+  private destroy$ = new Subject<void>(); // NUOVO per gestire unsubscribe
+
   constructor(
     private gS: ManageServiceService,
   ) {}
 
   ngOnInit():void{
     if(this.ip.length>0){
-      this.serviceList = this.gS.getServiceByIp(this.ip);
+      this.loadingData();
     }
 
   }
+
+  loadingData():void{
+    this.isLoading = true;
+    this.loadingError = null;
+    this.gS.getServiceByIpO(this.ip).pipe(
+      takeUntil(this.destroy$),
+      finalize(()=>this.isLoading  = false)
+    ).subscribe(
+        {
+          next: (services)=>{
+            this.serviceList = services;
+            console.log(" TableServicesComponent: loading services form database ");
+          },
+          error:(error)=>{
+
+            console.error(" TableServicesComponent: problem loading services form database ");
+
+            this.serviceList = this.gS.getServiceByIp(this.ip);
+
+          }
+        }
+      );
+
+
+  }
+
+
 
   sortData(sort: Sort){
     const data = this.serviceList.slice();

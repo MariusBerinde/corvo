@@ -168,10 +168,7 @@ export class ReportViewComponent implements OnInit {
     return this.reportText ? this.reportText.split('\n').length : 0;
   }
 
-  // Metodo da implementare in base alla tua architettura
   private getCurrentUsername(): string {
-    // Implementa la logica per ottenere l'username corrente
-    // Esempio: return this.authService.getCurrentUser()?.username || '';
 
     return this.storage.getData("username")??""; // Placeholder
   }

@@ -50,7 +50,16 @@
         <span>Non ci sono regole disabilite</span>
         }
         <br>
-        <button mat-raised-button >Lancia scansione</button>
+        <button mat-raised-button (click)="startLynisScan()" >Lancia scansione</button>
+        @if(timeToWait>0){
+        <p>Scansione in corso mancano {{timeToWait}} </p>
+        }
+        @if(isStarted){
+          <p>Scansione partita attendi circa 3 minuti fino alla prossima scansione</p>
+        }
+        @else{
+        <p>Problema con il lancio della scansione andare sulla macchina per trovare i dettagli</p>
+        }
         <span class="spacer"></span>
         <span class="spacer"></span>
         <button mat-raised-button (click)="testDialog()">Aggiungi regola da disabilitare</button>

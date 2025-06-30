@@ -88,7 +88,6 @@ export class LynisComponent implements OnInit{
           console.log("Loading config of lynis from the db errol , load the mock data");
           this.acutalConfig = this.lynis.getActualConfig(this.ip);
 
-          //TODO:continue from here
         }
       })
 
@@ -156,6 +155,46 @@ testDialog() {
 
 
 
+  }
+
+  // Aggiungi questa proprietà alla tua classe per tracciare l'ultimo timestamp della scansione
+  private lastScanTimestamp: number = 0;
+  timeToWait:number = 0;
+  isStarted:boolean|null = null;
+  private readonly SCAN_COOLDOWN_MS = 3 * 60 * 1000; // 3 minuti in millisecondi
+
+  startLynisScan(): void {
+    const now = Date.now();
+    const timeSinceLastScan = now - this.lastScanTimestamp;
+
+    // Controlla se sono passati almeno 3 minuti dall'ultima scansione
+    if (this.lastScanTimestamp > 0 && timeSinceLastScan < this.SCAN_COOLDOWN_MS) {
+      const remainingTime = Math.ceil((this.SCAN_COOLDOWN_MS - timeSinceLastScan) / 1000);
+      this.timeToWait = remainingTime;
+      console.warn(`Scansione bloccata. Attendere ancora ${remainingTime} secondi prima di poter avviare una nuova scansione.`);
+
+      // Opzionale: mostra un messaggio all'utente
+      // this.showMessage(`Attendere ${Math.ceil(remainingTime / 60)} minuti prima di avviare una nuova scansione.`);
+
+      return;
+    }
+
+    // Aggiorna il timestamp dell'ultima scansione
+    this.lastScanTimestamp = now;
+
+    // Avvia la scansione
+    this.lynis.startLynisScan(this.ip).then((success) => {
+      if (!success) {
+        // Se la scansione fallisce, resetta il timestamp per permettere un nuovo tentativo immediato
+        this.lastScanTimestamp = 0;
+        console.error("Scansione fallita, timestamp resettato per permettere un nuovo tentativo.");
+        this.isStarted = false;
+      } else {
+
+        this.isStarted = true;
+        console.log("Scansione avviata con successo.");
+      }
+    });
   }
 
   navigateToHome(){

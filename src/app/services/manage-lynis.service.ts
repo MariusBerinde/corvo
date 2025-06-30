@@ -557,16 +557,7 @@ protected listConfigs:Lynis[] = [
   getSkippableTestList():LynisTest[]{
     return this.skippableTestList;
   }
-/**
- * Sets the auditor name in the current Lynis configuration.
- * @param user - The name of the auditor to assign.
-  setAuditor(user:string,){
-    this.actualConif.auditor=user;
-  }
 
- */
-
-  //---
 /**
  * Replaces the current Lynis configuration with the provided one.
  * @param config - The new Lynis configuration object.
@@ -656,14 +647,6 @@ protected listConfigs:Lynis[] = [
       }
     }
 
-    console.log("=== ADDLYNISCONFIG ===");
-    console.log("🎯 URL:", url);
-    console.log("📦 Payload inviato al server:", JSON.stringify(body, null, 2));
-    console.log("👤 actualUsername:", body.username);
-    console.log("📧 email parametro:", body.lynis.ip);
-    console.log("📧 email parametro:", body.lynis.auditor);
-    console.log("📧 email parametro:", body.lynis.listIdSkippedTest);
-    console.log("========================");
     return new Promise(
       (resolve) => {
         this.http.post(
@@ -690,6 +673,55 @@ protected listConfigs:Lynis[] = [
 
   }
 
+  /**
+ * Starts a Lynis security scan on the specified IP address.
+ * This function calls the backend REST endpoint to initiate the scan process.
+ *
+ * @param ip - The IP address of the target machine where the scan should be started
+ * @returns Promise<boolean> - Returns true if the scan was started successfully, false otherwise
+ */
+  startLynisScan(ip: string): Promise<boolean> {
+    const url = `${this.API_BASE}/startLynisScan`;
+
+    const headers = new HttpHeaders({
+      'username': this.actualUsername,
+      'ip': ip
+    });
+
+    return new Promise((resolve) => {
+      this.http.get(url, {
+        headers: headers,
+        observe: 'response'
+      }).subscribe({
+          next: (response) => {
+            console.log("Status in startLynisScan =", response.status);
+            console.log("Body in startLynisScan =", response.body);
+
+            // La scansione è stata avviata con successo se lo status è 202 (ACCEPTED)
+            resolve(response.status === 202 || response.status==200);
+          },
+          error: (error) => {
+            console.log("Error in startLynisScan =", error.status);
+            console.log("Error message =", error.error);
+          if (error.status === 200 && error.error instanceof SyntaxError) {
+                    console.log("Received status 200 with empty/invalid JSON body - treating as success");
+                    resolve(true);
+//                    return;
+                  }
+            // Log dettagliato dell'errore per debugging
+            if (error.status === 400) {
+              console.warn("Bad request - missing username or ip field, or client not running");
+            } else if (error.status === 409) {
+              console.warn("Conflict - scan may already be running or user not authorized");
+            } else if (error.status === 500) {
+              console.error("Internal server error occurred while starting Lynis scan");
+            }
+
+            resolve(false);
+          }
+        });
+    });
+  }
 
 
 }

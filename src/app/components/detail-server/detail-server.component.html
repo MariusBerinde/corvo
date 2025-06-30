@@ -31,14 +31,48 @@
       <mat-list-item>
         <span matListItemTitle>Dettagli server</span>
         <span  matListItemLine>Ip:{{localServer.ip}}</span>
-        <span matListItemLine>Nome:{{localServer.name}}</span>
-        <span matListItemLine>Descrizione:{{localServer.descr}}</span>
+        <!-- NOME con modifica -->
+        <span matListItemLine>
+          <ng-container *ngIf="!isEditingName; else editNameBlock">
+            Nome: {{ localServer.name }}
+            <button mat-icon-button (click)="enableEdit('name')">
+              <mat-icon>edit</mat-icon>
+            </button>
+          </ng-container>
+          <ng-template #editNameBlock>
+            <mat-form-field appearance="fill">
+              <input matInput [(ngModel)]="newName" (ngModelChange)="onInputChange()" />
+            </mat-form-field>
+          </ng-template>
+        </span>
+
+        <!-- DESCRIZIONE con modifica -->
+        <span matListItemLine>
+          <ng-container *ngIf="!isEditingDescr; else editDescrBlock">
+            Descrizione: {{ localServer.descr }}
+            <button mat-icon-button (click)="enableEdit('descr')">
+              <mat-icon>edit</mat-icon>
+            </button>
+          </ng-container>
+          <ng-template #editDescrBlock>
+            <mat-form-field appearance="fill">
+              <input matInput [(ngModel)]="newDescr" (ngModelChange)="onInputChange()" />
+            </mat-form-field>
+          </ng-template>
+        </span>
         <span matListItemLine>Stato:@if(localServer.state){up}@else{down} </span>
       </mat-list-item>
     </mat-list>
 
     <br>
+    <div *ngIf="hasChanges" class="action-buttons">
+      <button mat-raised-button color="primary" (click)="saveChanges()" [disabled]="isSaving">Salva</button>
+      <button mat-raised-button color="warn" (click)="cancelEdit()" [disabled]="isSaving">Annulla</button>
+    </div>
 
+<!-- Messaggi -->
+<mat-error *ngIf="errorMessage">{{ errorMessage }}</mat-error>
+<mat-hint *ngIf="successMessage">{{ successMessage }}</mat-hint>
 <H2>Regole attive</H2>
     @if(activeRulesList.length>0){
 
