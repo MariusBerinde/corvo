@@ -41,17 +41,20 @@ export class ManageServiceService {
 
   private readonly API_BASE = 'http://localhost:8083';
   private actualUsername:string='';
+  private actualMail:string = '';
 
   private servicesByIpSb = new BehaviorSubject<Service []>([]);
   public servicesByIp$ = this.servicesByIpSb.asObservable();
   constructor(
     private storage:LocalWriteService,
-    private http:HttpClient
+    private http:HttpClient,
+    private log:ManageLogService
   ) {
 
       const username = this.storage.getData("username")??'';
       if(username.length>0)
         this.actualUsername = username;
+      this.actualMail = this.storage.getData("email")??'';
   }
 
 
@@ -67,6 +70,7 @@ export class ManageServiceService {
 
   getServiceByIpO(ip:String):Observable<Service[]>{
 
+    this.log.setLog(this.actualMail,`get all services from the ip = ${ip}`)
     const url = `${this.API_BASE}/getServiceByIp`;
     const body = {
       "username":this.actualUsername,

@@ -5,6 +5,8 @@ import {LocalWriteService} from './local-write.service';
 import { BehaviorSubject,  Observable,map, throwError } from 'rxjs';
 import {tap, retry, catchError} from 'rxjs/operators';
 import { HttpStatusCode } from '@angular/common/http';
+import {ManageLogService } from './manage-log.service';
+import { environment} from '../../environments/environment';
 
 @Injectable({
   providedIn: 'root'
@@ -45,10 +47,12 @@ export class ManageServerService {
 
   private serversSb = new BehaviorSubject<Server []>([]);
   public servers$ = this.serversSb.asObservable();
-  private readonly API_BASE = 'http://localhost:8083';
+  //private readonly API_BASE = 'http://localhost:8083';
+  private readonly API_BASE = environment.apiBaseUrl;
   constructor(
     private storage:LocalWriteService,
-    private http:HttpClient
+    private http:HttpClient,
+    private log:ManageLogService,
   ) {
 
     const localEmail:string  = this.storage.getData('email')??'';
@@ -75,6 +79,7 @@ public getAllServersO(): Observable<Server []> {
     'Content-Type': 'application/json',
     'email': this.email
   });
+    this.log.setLog(this.email,"get all the servers from the the database")
 
     return this.http.get<Server []>(url,{headers}).pipe(
 
@@ -164,6 +169,7 @@ updateIp(ip: string, name: string | null = null, descr: string | null = null): P
   if (descr !== null) {
     data.descr = descr;
   }
+    this.log.setLog(this.email,`update name/desc for the server with ip = ${ip}`)
 
   return new Promise<boolean>((resolve, reject) => {
     this.http.post(url, data, {
@@ -173,7 +179,7 @@ updateIp(ip: string, name: string | null = null, descr: string | null = null): P
       next: (response) => {
         console.log("Status in updateIp =", response.status);
         // Risolve con true se lo status è 200, false altrimenti
-        resolve(response.status === 200);
+        resolve(response.status === HttpStatusCode.Ok);
       },
       error: (error) => {
         console.log("Error in updateIp =", error.status);

@@ -3,7 +3,7 @@ import { Service } from '../../interfaces/service';
 import { ManageServiceService } from '../../services/manage-service.service'
 import { Sort, MatSortModule } from '@angular/material/sort';
 
-import { finalize, Subject ,takeUntil } from 'rxjs';
+import { finalize, Subject ,takeUntil,interval  } from 'rxjs';
 
 @Component({
   selector: 'table-services',
@@ -18,7 +18,7 @@ export class TableServicesComponent implements OnInit {
   loadingError : string | null = null;
 
 
-  private destroy$ = new Subject<void>(); // NUOVO per gestire unsubscribe
+  private destroy$ = new Subject<void>();
 
   constructor(
     private gS: ManageServiceService,
@@ -27,6 +27,12 @@ export class TableServicesComponent implements OnInit {
   ngOnInit():void{
     if(this.ip.length>0){
       this.loadingData();
+
+      interval(300000) // 5 minuti
+        .pipe(takeUntil(this.destroy$))
+        .subscribe(() => {
+          this.loadingData();
+        });
     }
 
   }
@@ -91,5 +97,10 @@ export class TableServicesComponent implements OnInit {
       return a.localeCompare(b) * (isAsc ? 1 : -1);
     }
     return 0;
+  }
+
+  ngOnDestroy():void{
+    this.destroy$.next();
+    this.destroy$.complete();
   }
 }

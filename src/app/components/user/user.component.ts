@@ -85,7 +85,7 @@ ngOnInit(): void{
       pwd:'defaultPassword',
       role:Role.Worker,
     };
-    var tmpUser = this.authService.getLoggedUser();
+    var tmpUser = this.authService.getLoggedUser(); //TODO: to check
     if (tmpUser != null){
       //this.actualUser = tmpUser;
       //this.actualUser .set(tmpUser);
@@ -126,7 +126,7 @@ ngOnInit(): void{
   });
 
     submitChangePwd(){
-      this.log.setLog(this.actualUser.username,"cambiamento password");
+      this.log.setLog(this.actualUser.email,"cambiamento password");
       //this.log.setLog(this.actualUser().username,"cambiamento password");
       if(this.formResetPwd.valid){
         this.pwdI = this.formResetPwd.value.pwd??'';
@@ -153,12 +153,30 @@ ngOnInit(): void{
 
       }
     }
+
+
   logout() {
-
-    this.storage.clearData();
-
-      this.router.navigate(['']);
+    this.log.loadLocalLogs().then(
+      (ris) => {
+        if (ris) {
+          // Solo se il caricamento è andato a buon fine, pulisci i dati locali
+          this.storage.clearData();
+          console.log("loading local logs to db user.component ok");
+        } else {
+          console.warn("loadLocalLogs returned false - logs not saved");
+        }
+      }
+    ).catch(
+        (reason) => {
+          console.error(`problem with load local logs ${reason}`);
+          alert(`Errore nel caricamento dei log: ${reason.message || reason}`);
+        }
+      ).finally(() => {
+        // La navigazione avviene sempre, indipendentemente dal risultato
+        this.router.navigate(['']);
+      });
   }
+
 
   // index varia tra 0 e 2
   togglePasswordVisibility(index:number) {

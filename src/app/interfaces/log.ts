@@ -1,5 +1,5 @@
 export interface Log {
-  id:number,
+  id?:number,
   data:string,
   userEmail:string, //è l'email
   ip?:string,

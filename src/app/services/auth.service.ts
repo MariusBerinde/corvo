@@ -3,9 +3,10 @@ import {User,Role} from '../interfaces/user';
 import * as bcrypt from 'bcryptjs';
 import {ManageLogService } from './manage-log.service';
 import {LocalWriteService} from './local-write.service';
-import {HttpClient,HttpHeaders } from '@angular/common/http';
+import {HttpClient,HttpHeaders, HttpStatusCode } from '@angular/common/http';
 import { BehaviorSubject,  Observable,map, throwError } from 'rxjs';
-import { catchError, tap, switchMap } from 'rxjs/operators';
+import { catchError, tap, switchMap, switchAll } from 'rxjs/operators';
+import { environment} from '../../environments/environment';
 
 interface ServerUser {
   email: string;
@@ -19,8 +20,10 @@ interface ServerUser {
 })
 export class AuthService {
   private actualUsername:string='';
+  private actualMail:string= '';
   private loggedUser:any = null ;
-  private readonly API_BASE = 'http://localhost:8083';
+  //private readonly API_BASE = 'http://localhost:8083';
+  private readonly API_BASE = environment.apiBaseUrl;
   private approvedUsersSb = new BehaviorSubject<string[]>([]);
   public approvedUsers$ = this.approvedUsersSb.asObservable();
 
@@ -40,7 +43,7 @@ export class AuthService {
   }
   ];
 
-  approvedUsers:string[]=["t1@gmail.com","t2@gmail.com","td@gmail.com"];
+  private approvedUsers:string[]=["t1@gmail.com","t2@gmail.com","td@gmail.com"];
 
 
 /**
@@ -56,6 +59,7 @@ export class AuthService {
     const localEmail:string  = this.storage.getData('email')??'';
 
     if(localEmail.length>0){
+      this.actualMail = localEmail;
 
       const username = this.storage.getData("username")??'';
       if(username.length>0)
@@ -89,7 +93,8 @@ export class AuthService {
 
 
     const data={"email":email,"password":pwd};
-    console.log("test richiesta post");
+    //console.log("test richiesta post");
+   this.log.setLog(this.actualMail,`try to authenticate user with email ${email}`)
     const url = `${this.API_BASE}/authUser`;
     return new Promise(
       (resolve) => {
@@ -103,7 +108,7 @@ export class AuthService {
               next:(response)=>{
                 console.log("Status in checkUserPwd =",response.status);
                 console.log("Body in checkUserPwd =",response.body);
-                if (response.status === 200)
+                if (response.status === HttpStatusCode.Ok)
                   if( response.body !== null)
                     this.loggedUser = response.body;
                    var tmp:any = response.body;
@@ -129,18 +134,6 @@ export class AuthService {
     return this.loggedUser;
   }
 
-  checkUserPwd1(email:string,pwd:string):boolean{
-
-
-    const hash:string |  undefined= this.tmpUsers.find(user=>user.email===email)?.pwd;
-
-    if (!hash) {
-      console.warn(`Nessun utente trovato con email ${email}`);
-      console.log(`Nessun utente trovato con email ${email}`);
-      return false;
-    }
-    return this.cmpPlainPwd(pwd,hash);
-  }
 
   /**
  * Creates a new user account with the given email, username, password, and role.
@@ -151,31 +144,16 @@ export class AuthService {
  * @returns True if the user was successfully created; false if an account with the given email already exists.
  */
 
-  createUser(email: string, username: string, plainPwd: string, role: Role = Role.Worker): boolean {
-    const exists = this.tmpUsers.some(user => user.email === email);
-    if (exists) {
-      console.warn(' Utente già registrato con questa email');
-      return false;
-    }
-    const pwdHash = this.creaHash(plainPwd);
-    const newUser: User = {
-      email,
-      username,
-      pwd: pwdHash,
-      role,
-    };
 
-    return true;
-  }
-
+  //TODO: check and add rejects management
   createUser2(email: string, username: string, plainPwd: string, role: Role = Role.Worker):Promise<boolean>{
 
     const data = {
-      "username":"lol",
+      "username":this.actualUsername,
       "user":{"name":username,"email":email,"password":plainPwd,"role":role}
     };
-    console.log("dentro isEmailApproved");
-    const url = 'http://localhost:8083/addUser';
+    this.log.setLog(this.actualMail,`creation of an account for the user with username ${username} and email=${email}`);
+    const url = `${this.API_BASE}/addUser`;
 
     return new Promise((resolve) => {
       this.http.post(url, data, {
@@ -186,23 +164,22 @@ export class AuthService {
             console.log("Body in createUser2 =", response.body);
 
             // Email approvata solo se status è 200
-            resolve(response.status === 200);
+            resolve(response.status === HttpStatusCode.Ok);
           },
           error: (error) => {
             console.log("Error in createUser2 - Status =", error.status);
 
             // Gestisci i diversi casi di errore
-            if(error.status === 200)
-              resolve(true)
-            if (error.status === 404) {
-              console.log("Email non trovata nella lista approvate");
-            } else if (error.status === 400) {
-              console.log("Richiesta malformata");
-            } else {
-              console.log("Errore generico:", error);
+            switch(error.status){
+              case HttpStatusCode.Ok:
+                resolve(true);
+                break;
+                case HttpStatusCode.NotFound: resolve(false)
+              break;
+                case HttpStatusCode.BadRequest : resolve(false)
+              break;
+                default: resolve(false)
             }
-
-            resolve(false);
           }
         });
     });
@@ -212,11 +189,12 @@ export class AuthService {
   /*  Returns the data of the user with the given email
    *  @param email - the user's  email
    * @returns The user data if found; otherwise, undefined.
-  */
+
   getUserData(email:string):User|undefined{
-    this.log.setLog(this.actualUsername,`Scaricati i dati di ${email}`);
+    this.log.setLog(this.actualMail,`Scaricati i dati di ${email}`);
     return this.tmpUsers.find(user=>user.email===email);
   }
+*/
 
 /**
  * Returns the username of the user with the given email.
@@ -224,34 +202,32 @@ export class AuthService {
  * @returns The user's username if found; otherwise, undefined.
  */
   getUserName(email:string):string|undefined{
-    this.log.setLog(this.actualUsername,`Recuperato lo username di ${email}`);
+    this.log.setLog(this.actualMail,`Recuperato lo username di ${email}`);
     return this.tmpUsers.find(user=>user.email===email)?.username;
   }
 
   /* Returns the role of the user with the given email
    *  @param email - the user's  email
    *  @returns The user's role if found ;otherwise, undefined.
-  */
   getUserRole(email:string):Role|undefined{
-    this.log.setLog(this.actualUsername,`Recuperato il ruolo di ${email}`);
+    this.log.setLog(this.actualMail,`Recuperato il ruolo di ${email}`);
     return this.tmpUsers.find(user=>user.email===email)?.role;
   }
-
+  */
 
   /**
    * Returns the role of the logged user
-   */
   getLoggedRole():Role{
     return this.loggedUser.role;
   }
+   */
 
   /* Sets a new password for the user with the given email
    *  @param email - the user's  email
    *  @param newPwd - the new plain-text password to set
    *  @returns true if the password was successfully update; otherwise;false
-  */
   setNewPwd(email:string,newPwd:string):boolean{
-    this.log.setLog(this.actualUsername,`Creata nuova password per l'utente con mail ${email}`);
+    this.log.setLog(this.actualMail,`Creata nuova password per l'utente con mail ${email}`);
     const refUser :User|undefined = this.tmpUsers.find( u=> u.email === email);
     if(refUser ){
       refUser.pwd = this.creaHash(newPwd);
@@ -261,10 +237,20 @@ export class AuthService {
       return false;
     }
   }
+
+  */
+  /**
+   * Updates tha password for the user identified with the email
+   * @param email the email of the user
+   * @param oldPwd the old password of the user
+   * @param newPwd the new password of the user
+   *
+   */
   updatePwdUser(email:string,oldPwd:string,newPwd:string):Promise<Number>{
 
     const data={"email":email,"oldPassword":oldPwd,"newPassword":newPwd};
     console.log("set New Pwd test richiesta post");
+    this.log.setLog(this.actualMail,`set new password for the user with email ${email}`)
 
     const url = `${this.API_BASE}/updatePassword`;
     return new Promise(
@@ -303,18 +289,19 @@ export class AuthService {
   /* Delete the user account associated with the given email
    *  @param email - the user's email
    *  @returns true if the user account was successfully deleted;false if no matching user was found for the provided email.
-   */
   deleteUser(email:string):boolean{
     const iUser = this.tmpUsers.findIndex(user=>user.email===email);
     if(iUser<0||iUser>this.tmpUsers.length){
-      this.log.setLog(this.actualUsername,`Tentato di cancellare l'utente con email ${email}`);
+      this.log.setLog(this.actualMail,`Tentato di cancellare l'utente con email ${email}`);
       return false;
     }
-      this.log.setLog(this.actualUsername,`Cancellato l'utente con email ${email}`);
+      this.log.setLog(this.actualMail,`Cancellato l'utente con email ${email}`);
       this.tmpUsers.splice(iUser,1);
       return true;
 
   }
+   */
+
 /**
    * Adds a user's email to the list of approved users.
    * @param email The email address of the user to approve and add.
@@ -326,7 +313,7 @@ export class AuthService {
     const oldLength = this.approvedUsers.length;
     const newLength = this.approvedUsers.push(email);
     if(oldLength === (newLength-1)){
-      this.log.setLog(this.actualUsername,`aggiunto utente ${email} come registrabile`);
+      this.log.setLog(this.actualMail,`aggiunto utente ${email} come registrabile`);
       return true;
     }else{
       return false;
@@ -338,16 +325,17 @@ export class AuthService {
    * @param email The email address to check for approval.
    * @returns `true` if the email is found in the approved users list,
    * `false` otherwise.
-   */
   isEmailApproved(email:string):boolean{
     const index=this.approvedUsers.indexOf(email);
     return (index>=0 && index<=this.approvedUsers.length)
   }
+   */
 
   isEmailApproved2(email: string): Promise<boolean> {
     const data = {"email": email};
     console.log("dentro isEmailApproved");
-    const url = 'http://localhost:8083/isEmailApproved';
+    const url = `${this.API_BASE}/isEmailApproved`;
+    this.log.setLog(this.actualMail,`check if ${email} is approvede for user registration to the app`);
 
     return new Promise((resolve) => {
       this.http.post(url, data, {
@@ -358,23 +346,20 @@ export class AuthService {
             console.log("Body in isEmailApproved2 =", response.body);
 
             // Email approvata solo se status è 200
-            resolve(response.status === 200);
+            resolve(response.status === HttpStatusCode.Ok);
           },
           error: (error) => {
             console.log("Error in isEmailApproved2 - Status =", error.status);
-
-            // Gestisci i diversi casi di errore
-            if(error.status === 200)
-              resolve(true)
-            if (error.status === 404) {
-              console.log("Email non trovata nella lista approvate");
-            } else if (error.status === 400) {
-              console.log("Richiesta malformata");
-            } else {
-              console.log("Errore generico:", error);
+            switch(error.status){
+              case HttpStatusCode.Ok:  resolve(true);
+              break;
+                case HttpStatusCode.BadRequest :resolve(false)
+              break;
+                case HttpStatusCode.NotFound : resolve(false)
+              break;
+                default: resolve(false)
             }
 
-            resolve(false);
           }
         });
     });
@@ -404,10 +389,10 @@ export class AuthService {
 
     const iEmail = this.approvedUsers.findIndex(e=>e===email);
     if( iEmail<0 ){
-      this.log.setLog(this.actualUsername,`Tentato di cancellare pre-approvazione  per email ${email}`);
+      this.log.setLog(this.actualMail,`Tentato di cancellare pre-approvazione  per email ${email}`);
       return false;
     }
-      this.log.setLog(this.actualUsername,`Cancellata pre-approvazione  per email ${email}`);
+      this.log.setLog(this.actualMail,`Cancellata pre-approvazione  per email ${email}`);
     this.approvedUsers.splice(iEmail,1);
     return true;
   }
@@ -418,9 +403,8 @@ export class AuthService {
  * @param email - The email address of the user whose role is to be updated.
  * @param newRole - The new role to assign to the user (e.g., Supervisor or Worker).
  * @returns true if the role was successfully updated; false if no user was found with the given email.
- */
   setNewRole(email:string,newRole:Role):boolean{
-    this.log.setLog(this.actualUsername,`Aggiorna nuovo ruolo ${newRole} per l'utente con mail ${email}`);
+    this.log.setLog(this.actualMail,`Aggiorna nuovo ruolo ${newRole} per l'utente con mail ${email}`);
     const refUser :User|undefined = this.tmpUsers.find( u=> u.email === email);
     if(refUser ){
       refUser.role = newRole;
@@ -431,6 +415,7 @@ export class AuthService {
     }
 
   }
+ */
 /**
  * Retrieves information for all users without including their passwords.
  * Creates a safe version of the user list by removing the password field from each user object.
@@ -445,60 +430,6 @@ getAllUsersInfo(): Omit<User, 'pwd'>[] {
     });
   }
 
-  testPing1(username: string): Promise<boolean> {
-    const url = 'http://localhost:8083/ping1';
-
-    const headers = new HttpHeaders({
-      'Content-Type': 'application/json',
-      'username': username
-    });
-
-    return new Promise<boolean>((resolve) => {
-      this.http.get<any>(url, {
-        headers: headers,
-        observe: 'response'
-      }).subscribe({
-          next: (response) => {
-            console.log('✅ Status:', response.status);
-            console.log('📦 Body:', response.body);
-            resolve(response.status === 200);
-          },
-          error: (error) => {
-
-            console.error('❌ Errore HTTP:', error.status);
-            if(error.status!==200){
-            resolve(false);
-            }
-          }
-        });
-    });
-  }
-
-  testPost( username:string):void{
-    const data={"username":username};
-    console.log("test richiesta post");
-    const url = 'http://localhost:8083/ping2';
-    var statusMsg=0;
-    var mgs;
-    this.http.post(url,data,{
-        observe: 'response'
-    }).subscribe({
-          next: (response) => {
-          statusMsg = response.status
-          mgs=response.body;
-            console.log('✅ Status:', response.status);
-            console.log('📦 Body:', response.body);
-          },
-
-          error: (error) => {
-            console.error('❌ Errore HTTP:', error.status);
-          }
-        });
-
-    console.log("testPost status=",statusMsg);
-    console.log("testPost body=",mgs);
-
-  }
 
   /**
   * @param username the name of the user who will take from the server the list of mails of the users approved for the registration
@@ -509,6 +440,7 @@ getAllUsersInfo(): Omit<User, 'pwd'>[] {
     const url = `${this.API_BASE}/getApprovedUsers`;
 
     console.log("getApprovedUsersO: username=",username);
+    this.log.setLog(this.actualMail,"get approved users ")
     const headers = new HttpHeaders({
       'Content-Type': 'application/json',
       'username': username
@@ -530,6 +462,7 @@ getAllUsersInfo(): Omit<User, 'pwd'>[] {
     const body = { "username": "lol", "email": email } ;
 
     const url = `${this.API_BASE}/enableUserRegistration`;
+    this.log.setLog(this.actualMail,`enable registration for email ${email}`)
     return this.http.post<any>(url, body)
       .pipe(
         tap(() => {
@@ -546,9 +479,8 @@ getAllUsersInfo(): Omit<User, 'pwd'>[] {
   deleteEnabledUser(email: string): Observable<number> {
     var username = this.storage.getData("username") ?? "";
     const body = { "username": username, "email": email };
-    console.log("body of deleteEnabledUser username=", body.username);
-    console.log("body of deleteEnabledUser email=", body.email);
     const url = `${this.API_BASE}/deleteEnabledUser`;
+    this.log.setLog(this.actualMail,`disable registration to the app for user with email=${email}`)
 
     return this.http.post<number>(url, body)
       .pipe(
@@ -589,7 +521,7 @@ getAllUsersInfo(): Omit<User, 'pwd'>[] {
 
     const url = `${this.API_BASE}/getAllUsers`;
 
-    console.log("getApprovedUsersO: username=",username);
+    this.log.setLog(this.actualMail,"get all the info of the users")
     const headers = new HttpHeaders({
       'Content-Type': 'application/json',
       'username': username
@@ -601,6 +533,9 @@ return this.http.get<ServerUser[]>(url, { headers }).pipe(
   }
 
 
+  /**
+   * Function that maps the
+   */
   private mapServerUserToClientUser(serverUser: ServerUser): Omit<User, 'pwd'> {
     return {
       email: serverUser.email,
@@ -609,6 +544,9 @@ return this.http.get<ServerUser[]>(url, { headers }).pipe(
     };
   }
 
+  /**
+   * map the server version of role to the client's version
+   */
   private mapServerRoleToEnum(serverRole: 'SUPERVISOR' | 'WORKER'): Role {
     return serverRole === 'SUPERVISOR' ? Role.Supervisor : Role.Worker;
   }
@@ -629,12 +567,13 @@ return this.http.get<ServerUser[]>(url, { headers }).pipe(
     }
 
     const url = `${this.API_BASE}/updateRoleUser`;
+    this.log.setLog(this.actualMail,` update the role of the user ${email} to the role ${newRole}`);
     return new Promise( (resolve) => { this.http.post( url,data,{ observe: 'response' }).
       subscribe( {
         next:(response)=>{
                 console.log("Status in updateUserRole =",response.status);
                 console.log("Body in updateUserRole =",response.body);
-                if (response.status === 200)
+                if (response.status === HttpStatusCode.Ok)
                   if( response.body !== null)
                   this.loggedUser = response.body;
 
@@ -655,13 +594,7 @@ return this.http.get<ServerUser[]>(url, { headers }).pipe(
   deleteUserP(email:string):Promise<boolean>{
       const data = { 'username': this.actualUsername , 'email': email};
       const url = `${this.API_BASE}/deleteUser`
-  // === DEBUG STAMPE ===
-    console.log("=== DELETE USER DEBUG ===");
-    console.log("🎯 URL:", url);
-    console.log("📦 Payload inviato al server:", JSON.stringify(data, null, 2));
-    console.log("👤 actualUsername:", data.username);
-    console.log("📧 email parametro:", data.email);
-    console.log("========================");
+    this.log.setLog(this.actualMail,`delete the user with email ${email}`)
     return new Promise( (resolve) => { this.http.post( url,data,{ observe: 'response' }).
       subscribe( {
         next:(response)=>{

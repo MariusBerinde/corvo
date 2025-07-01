@@ -77,16 +77,6 @@ export class RegistrazioneComponent {
                   }
                 }
               );
-              /*
-              if(this.auth.createUser(this.emailI,username,this.pwdI)){
-
-                    this.lS.saveData('email',this.emailI);
-                    console.log("Provo a navigare verso welcome");
-                    this._router.navigate(['']);
-              }else{
-                this.errorCreationUser = true;
-              }
-              */
             }
             else{
               let username=this.emailI.substring(0,this.emailI.indexOf('@'));
@@ -97,25 +87,6 @@ export class RegistrazioneComponent {
           }
         }
       );
-      /*
-      if(this.preApprovedEmail){
-        if(pwdUguali){
-          let username=this.emailI.substring(0,this.emailI.indexOf('@'));
-          if(this.auth.createUser(this.emailI,username,this.pwdI)){
-            this.lS.saveData('email',this.emailI);
-            this._router.navigate(['']);
-          }else{
-            this.errorCreationUser = true;
-          }
-        }
-        else{
-          let username=this.emailI.substring(0,this.emailI.indexOf('@'));
-          console.log("test estrazione username:",username);
-          console.log("password non coincidenti");
-          this.errorRePassword = true;
-        }
-      }
-      */
     }
   }
   private checkEmail(email:string):Promise<boolean>{

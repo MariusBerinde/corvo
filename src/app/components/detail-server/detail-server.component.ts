@@ -6,24 +6,18 @@ import { MatButtonModule } from '@angular/material/button';
 import { MatCardModule} from '@angular/material/card';
 import { MatListModule} from '@angular/material/list';
 
-import { ManageServiceService } from '../../services/manage-service.service';
 import { ManageRuleService } from '../../services/manage-rule.service';
 import { Router, RouterModule,ActivatedRoute } from '@angular/router';
 import { Rule } from '../../interfaces/rule';
-import { Service } from '../../interfaces/service';
 import { LocalWriteService } from '../../services/local-write.service';
 import { ManageServerService } from '../../services/manage-server.service';
 import { ManageLogService } from '../../services/manage-log.service';
 import { Server } from '../../interfaces/server';
-import { HomeComponent } from '../home/home.component';
 import { FormsModule } from '@angular/forms';
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatInputModule } from '@angular/material/input';
-import { MatSnackBarModule } from '@angular/material/snack-bar';
-import { finalize, Subject ,takeUntil } from 'rxjs';
+import { finalize, Subject ,takeUntil, interval  } from 'rxjs';
 import { CommonModule } from '@angular/common'; // ✅ NgIf, NgFor, etc.
-import { MatError } from '@angular/material/form-field'; // ✅ <mat-error>
-import { MatHint } from '@angular/material/form-field'; // ✅ <mat-hint>
 @Component({
   selector: 'app-detail-server',
   imports: [
@@ -65,6 +59,7 @@ export class DetailServerComponent implements OnInit{
     rulesDocker:Rule[]=[];
     rulesHa:Rule[]=[];
     actualUser:string='';
+    actualMail:string='';
     newName:string|null=null;
     newDescr:string|null=null;
     isEditingName = false;
@@ -98,13 +93,6 @@ export class DetailServerComponent implements OnInit{
       this.newName = this.localServer.name??"";
       this.newDescr = this.localServer.descr??"";
 
-     this.log.setLog(this.actualUser,"Corvo:visione status server="+this.ip);
-      /*
-     if(this.localServer.id===-1){
-       alert("Problema di rete sarai disconnesso");
-       this.logout();
-     }
-     */
 
 
      if(this.activeRulesList.length>0){
@@ -113,6 +101,12 @@ export class DetailServerComponent implements OnInit{
        this.rulesDB = this.activeRulesList.filter(obj=>obj.service===1);
        this.rulesDocker = this.activeRulesList.filter(obj=>obj.service===2);
        this.rulesHa = this.activeRulesList.filter(obj=>obj.service===3);
+
+      interval(300000) // 5 minuti
+        .pipe(takeUntil(this.destroy$))
+        .subscribe(() => {
+          this.loadActiveRules();
+        });
 
      }
 
@@ -148,9 +142,25 @@ export class DetailServerComponent implements OnInit{
     this.loadActiveRules();
   }
 logout() {
-  this.log.setLog(this.actualUser,"Corvo:logout da detail server");
-    this.storage.clearData();
-      this.router.navigate(['']);
+    this.log.loadLocalLogs().then(
+      (ris) => {
+        if (ris) {
+          // Solo se il caricamento è andato a buon fine, pulisci i dati locali
+          this.storage.clearData();
+          console.log("loading local logs to db user.component ok");
+        } else {
+          console.warn("loadLocalLogs returned false - logs not saved");
+        }
+      }
+    ).catch(
+        (reason) => {
+          console.error(`problem with load local logs ${reason}`);
+          alert(`Errore nel caricamento dei log: ${reason.message || reason}`);
+        }
+      ).finally(() => {
+        // La navigazione avviene sempre, indipendentemente dal risultato
+        this.router.navigate(['']);
+      });
   }
   navigateToLynis(){
     this.router.navigate(['lynis',this.ip]);
@@ -210,5 +220,10 @@ logout() {
     this.hasChanges = false;
     this.errorMessage = null;
     this.successMessage = null;
+  }
+
+  ngOnDestroy():void{
+    this.destroy$.next();
+    this.destroy$.complete();
   }
 }

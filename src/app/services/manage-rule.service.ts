@@ -7,13 +7,17 @@ import {HttpClient,HttpHeaders } from '@angular/common/http';
 import { BehaviorSubject,  Observable,map, throwError } from 'rxjs';
 import { catchError, tap, switchMap } from 'rxjs/operators';
 import {ManageLogService } from './manage-log.service';
+import { environment} from '../../environments/environment';
+
 @Injectable({
   providedIn: 'root'
 })
 export class ManageRuleService {
 
-  private readonly API_BASE = 'http://localhost:8083';
+  //private readonly API_BASE = 'http://localhost:8083';
+  private readonly API_BASE = environment.apiBaseUrl;
   private actualUsername:string='';
+  private email:string = '';
   private loggedUser:any = null ;
   private rulesByIpSb = new BehaviorSubject<Rule []>([]);
   public rulesByIp$ = this.rulesByIpSb.asObservable();
@@ -111,6 +115,7 @@ private listaRegole:Rule[]=[
       const username = this.storage.getData("username")??'';
       if(username.length>0)
         this.actualUsername = username;
+    this.email = this.storage.getData('email')??'';
   }
 /**
  * Retrieves all rules associated with a specific IP address.
@@ -142,6 +147,7 @@ private listaRegole:Rule[]=[
       "username":this.actualUsername,
       "ip":ip
     }
+    this.log.setLog(this.email,` gets the rules for the ip ${ip}`)
     return this.http.post<Rule[]>(url,body).pipe(
 
       tap((rules)=>{

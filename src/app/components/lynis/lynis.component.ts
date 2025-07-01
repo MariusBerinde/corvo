@@ -17,7 +17,7 @@ import { LynisRulesComponent } from './lynis-rules/lynis-rules.component';
 import { ReportViewComponent   } from '../report-view/report-view.component';
 import { HttpClientModule } from '@angular/common/http';
 
-import { finalize, Subject ,takeUntil } from 'rxjs';
+import { finalize, Subject ,takeUntil, interval } from 'rxjs';
 @Component({
   selector: 'app-lynis',
   imports: [
@@ -69,6 +69,12 @@ export class LynisComponent implements OnInit{
     this.ip = this.inRoute.snapshot.paramMap.get('ip')??'errore navigazione';
     //this.acutalConfig=this.lynis.getActualConfig(this.ip);
     this.loadLynisConfig();
+
+      interval(300000) // 5 minuti
+        .pipe(takeUntil(this.destroy$))
+        .subscribe(() => {
+          this.loadLynisConfig();
+        });
   }
 
 
@@ -99,7 +105,7 @@ export class LynisComponent implements OnInit{
       return 'Altair';
     }
 
-    const user = this.authService.getUserName(email);
+    const user = this.authService.getUserName(email); //TODO:check
 
     if (!user ) {
       return 'Default';
@@ -109,8 +115,25 @@ export class LynisComponent implements OnInit{
   }
 
   logout() {
-    this.storage.clearData();
-      this.router.navigate(['']);
+    this.log.loadLocalLogs().then(
+      (ris) => {
+        if (ris) {
+          // Solo se il caricamento è andato a buon fine, pulisci i dati locali
+          this.storage.clearData();
+          console.log("loading local logs to db user.component ok");
+        } else {
+          console.warn("loadLocalLogs returned false - logs not saved");
+        }
+      }
+    ).catch(
+        (reason) => {
+          console.error(`problem with load local logs ${reason}`);
+          alert(`Errore nel caricamento dei log: ${reason.message || reason}`);
+        }
+      ).finally(() => {
+        // La navigazione avviene sempre, indipendentemente dal risultato
+        this.router.navigate(['']);
+      });
   }
 testDialog() {
     //console.log("valore di mini0=", this.mini[0]?.id);
@@ -199,6 +222,11 @@ testDialog() {
 
   navigateToHome(){
     this.router.navigate(['home']);
+  }
+
+  ngOnDestroy():void{
+    this.destroy$.next();
+    this.destroy$.complete();
   }
 }
 

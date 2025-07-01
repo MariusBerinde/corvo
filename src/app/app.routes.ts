@@ -36,6 +36,7 @@ export const routes: Routes = [
   {
     path:'detail-server/:ip',
     component: DetailServerComponent,
+    data: { prerender: false }
   },
   {
     path:'lynis/:ip',

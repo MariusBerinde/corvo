@@ -1,17 +1,22 @@
-import { Injectable } from '@angular/core';
+import { Injectable,HostListener } from '@angular/core';
 import { Log } from '../interfaces/log';
 import { Observable, throwError } from 'rxjs';
 import {HttpClient,HttpHeaders,HttpErrorResponse,HttpResponse } from '@angular/common/http';
 import { retry, catchError,map } from 'rxjs/operators';
 import {LocalWriteService} from './local-write.service';
-
+import { lastValueFrom } from 'rxjs';
 import { HttpStatusCode } from '@angular/common/http';
+import { resolve } from 'node:path';
+import { response } from 'express';
+import { brotliCompress } from 'node:zlib';
+import { environment} from '../../environments/environment';
 @Injectable({
   providedIn: 'root'
 })
 export class ManageLogService {
 
-  private readonly API_BASE = 'http://localhost:8083';
+  //private readonly API_BASE = 'http://localhost:8083';
+  private readonly API_BASE = environment.apiBaseUrl;
   protected listaLog:Log[]=[{
     "id":0,
     "data":"Mon May 05 2025 10:48:30 GMT+0200 (Ora legale dell’Europa centrale)",
@@ -83,7 +88,11 @@ export class ManageLogService {
     "descr":"Modificata regola ACD",
   }
   ];
-  email:string='';
+
+  private localLogs:Log[] = [];
+  private email:string='';
+  private username:string='';
+
   constructor(
     private storage:LocalWriteService,
     private http:HttpClient
@@ -93,6 +102,7 @@ export class ManageLogService {
 
       if(localEmail.length>0)
         this.email = localEmail;
+    this.username = this.storage.getData("username")??"";
   }
   /* Returns all the logs from the database
    */
@@ -176,7 +186,7 @@ export class ManageLogService {
       'Content-Type': 'application/json',
       'email': this.email
     });
-    console.log("lanciato getUserLog ");
+    console.log("lanciato getUserLog con email = ",this.email);
 
     return this.http.get<Log[]>(url, {
       headers: headers,
@@ -200,10 +210,9 @@ export class ManageLogService {
     const value = Date.now();
     const currentDate = new Date(value);
 
+
     const currentDateStr = currentDate.toString();
-    const lastId=this.listaLog[this.listaLog.length-1].id;
     const actualLog:Log={
-      id:lastId+1,
       data:currentDateStr,
       userEmail:user,
       ip:server,
@@ -211,7 +220,65 @@ export class ManageLogService {
       descr:descr,
     };
 
-   this.listaLog.push(actualLog);
+    console.log(`inserimento log ${actualLog.userEmail}`)
+
+
+   this.localLogs.push(actualLog);
+  }
+
+public async loadLocalLogs(): Promise<boolean> {
+  const url = `${this.API_BASE}/addAllLogs`;
+  const data = {
+    "username": this.username,
+    "logs": this.localLogs
+  }
+    console.log(`loadLocalLogs username = ${data.username} `)
+    console.log(`loadLocalLogs logs = ${this.localLogs}`)
+
+  try {
+    const response = await lastValueFrom(
+      this.http.post<String>(url, data, { observe: 'response' })
+    );
+
+    return response.status === HttpStatusCode.Ok;
+
+  } catch (error: any) {
+    console.log("loadLocalLogs error:", error);
+
+    switch (error.status) {
+      case HttpStatusCode.BadRequest:
+        throw new Error(`Bad Request: ${error.message || 'Invalid request'}`);
+
+      case HttpStatusCode.Unauthorized:
+        throw new Error(`Unauthorized: ${error.message || 'Authentication failed'}`);
+
+      default:
+        throw new Error(`Request failed with status ${error.status}: ${error.message || 'Unknown error'}`);
+    }
+  }
+}
+
+  @HostListener('window:beforeunload', ['$event'])
+  handleBeforeUnload(event: BeforeUnloadEvent) {
+    try {
+      if (this.localLogs.length > 0) {
+        const data = {
+          username: this.username,
+          logs: this.localLogs
+        };
+
+        const blob = new Blob([JSON.stringify(data)], {
+          type: 'application/json'
+        });
+
+        navigator.sendBeacon(`${this.API_BASE}/addAllLogs`, blob);
+
+        // opzionale: svuota i log locali se vuoi
+        // this.localLogs = [];
+      }
+    } catch (e) {
+      console.warn('Errore nell\'invio dei log prima della chiusura:', e);
+    }
   }
 
 }

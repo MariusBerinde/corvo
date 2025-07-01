@@ -13,8 +13,7 @@ import { NgIf, NgFor } from '@angular/common'; // Importa NgIf e NgFor
 import { MatTooltipModule } from '@angular/material/tooltip';
 import { MatTableModule } from '@angular/material/table';
 import {User,Role} from '../../interfaces/user';
-import { isMap } from 'util/types';
-import { finalize, Subject ,takeUntil } from 'rxjs';
+import { finalize, Subject ,takeUntil,interval } from 'rxjs';
 import { error } from 'console';
 
 @Component({
@@ -66,6 +65,12 @@ export class TableUsersComponent implements OnInit {
       this.loadAllUsers();
       //this.users = this.auth.getAllUsersInfo();
 
+      interval(300000) // 5 minuti
+        .pipe(takeUntil(this.destroy$))
+        .subscribe(() => {
+          this.loadApprovedUsers();
+          this.loadAllUsers();
+        });
     }
   }
 
@@ -144,7 +149,7 @@ deleteMail(email: string): void {
         console.log("Lista aggiornata nel componente:", this.approvedUsers);
 
         // Rimuovi la doppia chiamata - fai solo una volta
-        this.auth.removeApprovedUser(email);
+        this.auth.removeApprovedUser(email); //TODO:check
       } else {
         console.warn("Nessun elemento cancellato - email non trovata nel database");
         this.approvedUsersError = `Email ${email} non trovata nel database`;
@@ -229,7 +234,7 @@ deleteMail(email: string): void {
             console.log(`${newEmail} aggiunto con successo.`);
 
             // Mantieni sincronizzazione con auth service per compatibilità
-            this.auth.setApprovedUser(newEmail);
+            this.auth.setApprovedUser(newEmail); //TODO:check
             },
             error : (error)=>{
 
@@ -280,4 +285,8 @@ toggleUserRole(email: string, currentRole: Role): void {
     //this.auth.setNewRole(email, newRole); // Chiama il servizio auth per aggiornare il ruolo
   }
 
+  ngOnDestroy():void{
+    this.destroy$.next();
+    this.destroy$.complete();
+  }
 }

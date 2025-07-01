@@ -7,7 +7,10 @@
     "build": "ng build",
     "watch": "ng build --watch --configuration development",
     "test": "ng test",
-    "serve:ssr:corvo": "node dist/corvo/server/server.mjs"
+    "serve:ssr:corvo": "node dist/corvo/server/server.mjs",
+    "build:ssr": "ng build && ng run corvo:server",
+    "serve:ssr": "node dist/corvo/server/server.mjs"
+
   },
   "private": true,
   "dependencies": {

@@ -2,9 +2,10 @@ import { Injectable } from '@angular/core';
 import { LynisTest,Lynis } from '../interfaces/lynis';
 import {ManageLogService } from './manage-log.service';
 import {LocalWriteService} from './local-write.service';
-import {HttpClient,HttpHeaders } from '@angular/common/http';
+import {HttpClient,HttpHeaders, HttpStatusCode } from '@angular/common/http';
 import { BehaviorSubject,  Observable,map, throwError } from 'rxjs';
 import { catchError, tap, switchMap } from 'rxjs/operators';
+import { environment} from '../../environments/environment';
 
 @Injectable({
   providedIn: 'root'
@@ -535,7 +536,9 @@ protected listConfigs:Lynis[] = [
   ];
 
   private actualUsername:string='';
-  private readonly API_BASE = 'http://localhost:8083';
+  private email:string = '';
+  //private readonly API_BASE = 'http://localhost:8083';
+  private readonly API_BASE = environment.apiBaseUrl;
   private lynisConfigSb = new BehaviorSubject<Lynis | null>(null);
 
   public lynisConfig$ = this.lynisConfigSb.asObservable();
@@ -549,6 +552,7 @@ protected listConfigs:Lynis[] = [
       const username = this.storage.getData("username")??'';
       if(username.length>0)
         this.actualUsername = username;
+    this.email=this.storage.getData('email')??'';
   }
 /**
  * Retrieves the list of Lynis tests that can be skipped.
@@ -587,10 +591,10 @@ protected listConfigs:Lynis[] = [
 
     const url = `${this.API_BASE}/getLynisByIp`;
     const body = {
-
       "username": this.actualUsername,
       "ip":ip
     }
+    this.log.setLog(this.email,`get the lynis config from the ip : ${ip}`)
 
     return this.http.post<Lynis>(url,body).pipe(
 
@@ -646,6 +650,7 @@ protected listConfigs:Lynis[] = [
         "listIdSkippedTest":listOfTest
       }
     }
+    this.log.setLog(this.email,`add the list of skippable test for the ip ${ip}`,ip)
 
     return new Promise(
       (resolve) => {
@@ -660,7 +665,7 @@ protected listConfigs:Lynis[] = [
                 console.log("Status in addLynisConfig =",response.status);
                 console.log("Body in addLynisConfig =",response.body);
 
-                resolve(response.status === 200);
+                resolve(response.status === HttpStatusCode.Ok);
               },
               error:(error)=>{
                 console.log("error in addLynisConfig =",error.status);
@@ -687,7 +692,7 @@ protected listConfigs:Lynis[] = [
       'username': this.actualUsername,
       'ip': ip
     });
-
+    this.log.setLog(this.email, `start the lynis scan for the ip= ${ip}`)
     return new Promise((resolve) => {
       this.http.get(url, {
         headers: headers,
@@ -698,7 +703,7 @@ protected listConfigs:Lynis[] = [
             console.log("Body in startLynisScan =", response.body);
 
             // La scansione è stata avviata con successo se lo status è 202 (ACCEPTED)
-            resolve(response.status === 202 || response.status==200);
+            resolve(response.status === HttpStatusCode.Accepted || response.status == HttpStatusCode.Ok);
           },
           error: (error) => {
             console.log("Error in startLynisScan =", error.status);
@@ -709,11 +714,11 @@ protected listConfigs:Lynis[] = [
 //                    return;
                   }
             // Log dettagliato dell'errore per debugging
-            if (error.status === 400) {
+            if (error.status === HttpStatusCode.BadRequest) {
               console.warn("Bad request - missing username or ip field, or client not running");
-            } else if (error.status === 409) {
+            } else if (error.status === HttpStatusCode.Conflict ) {
               console.warn("Conflict - scan may already be running or user not authorized");
-            } else if (error.status === 500) {
+            } else if (error.status === HttpStatusCode.InternalServerError) {
               console.error("Internal server error occurred while starting Lynis scan");
             }
 
