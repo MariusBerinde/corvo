@@ -149,7 +149,7 @@ export class AuthService {
   createUser2(email: string, username: string, plainPwd: string, role: Role = Role.Worker):Promise<boolean>{
 
     const data = {
-      "username":this.actualUsername,
+      "username":"lol",
       "user":{"name":username,"email":email,"password":plainPwd,"role":role}
     };
     this.log.setLog(this.actualMail,`creation of an account for the user with username ${username} and email=${email}`);
