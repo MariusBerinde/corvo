@@ -149,7 +149,6 @@ export class AuthService {
   createUser2(email: string, username: string, plainPwd: string, role: Role = Role.Worker):Promise<boolean>{
 
     const data = {
-      "username":"lol",
       "user":{"name":username,"email":email,"password":plainPwd,"role":role}
     };
     this.log.setLog(this.actualMail,`creation of an account for the user with username ${username} and email=${email}`);
@@ -459,7 +458,7 @@ getAllUsersInfo(): Omit<User, 'pwd'>[] {
   */
   enableUserRegistration(email: string): Observable<any> {
     var username = this.storage.getData("username")??"";
-    const body = { "username": "lol", "email": email } ;
+    const body = { "username": this.actualUsername, "email": email } ;
 
     const url = `${this.API_BASE}/enableUserRegistration`;
     this.log.setLog(this.actualMail,`enable registration for email ${email}`)
@@ -559,7 +558,7 @@ return this.http.get<ServerUser[]>(url, { headers }).pipe(
   updateUserRole( email:string,newRole:Role):Promise<boolean>{
 
     const data= {
-      "username": "lol",
+      "username": this.actualUsername,
       "user": {
         "email": email,
         "role": newRole

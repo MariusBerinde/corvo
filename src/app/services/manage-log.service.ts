@@ -121,6 +121,7 @@ export class ManageLogService {
       'Content-Type': 'application/json',
       'username': this.email
     });
+    console.log("getAllLogsO username=",this.email);
 
     return this.http.get<Log[]>(url, {
       headers: headers,
@@ -184,9 +185,9 @@ export class ManageLogService {
     const url = `${this.API_BASE}/getUserLogs`;
     const headers = new HttpHeaders({
       'Content-Type': 'application/json',
-      'email': this.email
+      'email': email
     });
-    console.log("lanciato getUserLog con email = ",this.email);
+    console.log("lanciato getUserLog con email = ",email);
 
     return this.http.get<Log[]>(url, {
       headers: headers,

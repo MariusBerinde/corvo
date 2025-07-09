@@ -55,7 +55,7 @@ export class TableLogComponent implements OnInit {
           console.log("loading all logs = ",tmp);
 
           //this.servers = tmp;
-          this.sortedLogs.set(tmp);
+          this.sortedLogs.set(tmp.filter(l=>l.userEmail !== this.localMail));
         },
         error: (error)=>{
           console.log("error loading all logs =",error);
@@ -73,7 +73,7 @@ export class TableLogComponent implements OnInit {
           console.log("loading user log = ",tmp);
 
           //this.servers = tmp;
-          this.sortedLogs.set(tmp)
+          this.sortedLogs.set(tmp.filter(l => l.userEmail === this.localMail))
         },
         error: (error)=>{
           console.log("error loading user log=",error);

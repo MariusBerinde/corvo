@@ -27,99 +27,132 @@
 
 
   <mat-card-content>
-    <mat-list>
-      <mat-list-item>
-        <span matListItemTitle>Dettagli server</span>
-        <span  matListItemLine>Ip:{{localServer.ip}}</span>
-        <!-- NOME con modifica -->
-        <span matListItemLine>
-          <ng-container *ngIf="!isEditingName; else editNameBlock">
-            Nome: {{ localServer.name }}
-            <button mat-icon-button (click)="enableEdit('name')">
-              <mat-icon>edit</mat-icon>
-            </button>
-          </ng-container>
-          <ng-template #editNameBlock>
-            <mat-form-field appearance="fill">
-              <input matInput [(ngModel)]="newName" (ngModelChange)="onInputChange()" />
-            </mat-form-field>
-          </ng-template>
-        </span>
 
-        <!-- DESCRIZIONE con modifica -->
-        <span matListItemLine>
-          <ng-container *ngIf="!isEditingDescr; else editDescrBlock">
-            Descrizione: {{ localServer.descr }}
-            <button mat-icon-button (click)="enableEdit('descr')">
-              <mat-icon>edit</mat-icon>
-            </button>
-          </ng-container>
-          <ng-template #editDescrBlock>
-            <mat-form-field appearance="fill">
-              <input matInput [(ngModel)]="newDescr" (ngModelChange)="onInputChange()" />
-            </mat-form-field>
-          </ng-template>
-        </span>
-        <span matListItemLine>Stato:@if(localServer.state){up}@else{down} </span>
-      </mat-list-item>
-    </mat-list>
+<div class="server-details-container">
+  <div class="server-info-card">
+    <h3 class="server-title">Dettagli server</h3>
 
-    <br>
-    <div *ngIf="hasChanges" class="action-buttons">
-      <button mat-raised-button color="primary" (click)="saveChanges()" [disabled]="isSaving">Salva</button>
-      <button mat-raised-button color="warn" (click)="cancelEdit()" [disabled]="isSaving">Annulla</button>
+    <!-- IP del server -->
+    <div class="info-row">
+      <strong>IP:</strong> {{localServer.ip}}
     </div>
 
+    <!-- NOME con modifica -->
+    <div class="info-row">
+      <ng-container *ngIf="!isEditingName; else editNameBlock">
+        <strong>Nome:</strong> {{ localServer.name }}
+        <button mat-icon-button (click)="enableEdit('name')" class="edit-button">
+          <mat-icon>edit</mat-icon>
+        </button>
+      </ng-container>
+      <ng-template #editNameBlock>
+        <div class="edit-field">
+          <strong>Nome:</strong>
+          <mat-form-field appearance="fill" class="edit-input">
+            <input matInput [(ngModel)]="newName" (ngModelChange)="onInputChange()" />
+          </mat-form-field>
+        </div>
+      </ng-template>
+    </div>
+
+    <!-- DESCRIZIONE con modifica -->
+    <div class="info-row">
+      <ng-container *ngIf="!isEditingDescr; else editDescrBlock">
+        <strong>Descrizione:</strong> {{ localServer.descr }}
+        <button mat-icon-button (click)="enableEdit('descr')" class="edit-button">
+          <mat-icon>edit</mat-icon>
+        </button>
+      </ng-container>
+      <ng-template #editDescrBlock>
+        <div class="edit-field">
+          <strong>Descrizione:</strong>
+          <mat-form-field appearance="fill" class="edit-input">
+            <input matInput [(ngModel)]="newDescr" (ngModelChange)="onInputChange()" />
+          </mat-form-field>
+        </div>
+      </ng-template>
+    </div>
+
+    <!-- Stato del server -->
+    <div class="info-row">
+      <strong>Stato:</strong>
+      <span [class]="localServer.state ? 'status-up' : 'status-down'">
+        @if(localServer.state){up}@else{down}
+      </span>
+    </div>
+  </div>
+</div>
+
+<br>
+
+<div *ngIf="hasChanges" class="action-buttons">
+  <button mat-raised-button color="primary" (click)="saveChanges()" [disabled]="isSaving">
+    Salva
+  </button>
+  <button mat-raised-button color="warn" (click)="cancelEdit()" [disabled]="isSaving">
+    Annulla
+  </button>
+</div>
 <!-- Messaggi -->
 <mat-error *ngIf="errorMessage">{{ errorMessage }}</mat-error>
 <mat-hint *ngIf="successMessage">{{ successMessage }}</mat-hint>
-<H2>Regole attive</H2>
-    @if(activeRulesList.length>0){
+<div class="rules-section">
+  <div class="section-header">
+    <h3 class="section-title">
+      <mat-icon class="title-icon">security</mat-icon>
+      Regole di Sicurezza
+    </h3>
+  </div>
 
-    <mat-list>
-      @if(generalRules.length>0){
-      <mat-list-item>
-        <span matListItemTitle>Regole generali</span>
-      @for(val of generalRules; track val.id) {
-        <span matListItemLine>Descrizione:{{val.descr}}</span>
-
+  @if (activeRulesList.length > 0) {
+    <div class="rules-grid">
+      @for (val of activeRulesList; track val.id) {
+        <div class="rule-card">
+          <mat-card>
+            <mat-card-header>
+              <div mat-card-avatar class="rule-avatar">
+                <mat-icon>rule</mat-icon>
+              </div>
+              <mat-card-title class="rule-title">{{ val.name }}</mat-card-title>
+              <mat-card-subtitle class="rule-service">Regola di sicurezza</mat-card-subtitle>
+            </mat-card-header>
+            <mat-card-content>
+              <div class="rule-description">{{ val.descr }}</div>
+              <div class="rule-status">
+                <span class="status-label">Stato:</span>
+                <div class="status-badge" [ngClass]="{
+                  'active': val.status === true,
+                  'inactive': val.status === false,
+                }">
+                  <mat-icon class="status-icon">
+                    @if (val.status === true) {
+                      check_circle
+                    } @else if (val.status === false) {
+                      cancel
+                    } @else {
+                      warning
+                    }
+                  </mat-icon>
+                  {{ val.status }}
+                </div>
+              </div>
+            </mat-card-content>
+          </mat-card>
+        </div>
       }
-      </mat-list-item>
-      }
-
-      @if(rulesDB.length>0){
-
-      <mat-list-item>
-        <span matListItemTitle>Regole Database</span>
-        @for(val of rulesDB; track val.id) {
-        <span matListItemLine>Descrizione:{{val.descr}}</span>
-        }
-      </mat-list-item>
-      }
-
-      @if(rulesDocker.length>0){
-
-      <mat-list-item>
-        <span matListItemTitle>Regole Docker</span>
-        @for(val of rulesDocker; track val.id) {
-        <span matListItemLine>Descrizione:{{val.descr}}</span>
-        }
-      </mat-list-item>
-      }
-
-      @if(rulesHa.length>0){
-
-      <mat-list-item>
-        <span matListItemTitle>Regole Ha</span>
-        @for(val of rulesHa; track val.id) {
-        <span matListItemLine>Descrizione:{{val.descr}}</span>
-        }
-      </mat-list-item>
-      }
-    </mat-list>
-    }@else{
-    <span> Non ci sono regole attive</span>
-    }
+    </div>
+  } @else {
+    <div class="empty-state">
+      <mat-card class="empty-card">
+        <div class="empty-content">
+          <mat-icon class="empty-icon">shield_off</mat-icon>
+          <h3>Nessuna regola attiva</h3>
+          <p>Non sono state trovate regole di sicurezza attive per questo server.</p>
+        </div>
+      </mat-card>
+    </div>
+  }
+</div>
     <button   mat-raised-button (click)="navigateToLynis()">Scansione Lynis</button>
 
 

@@ -160,7 +160,6 @@ ngOnInit(): void{
       (ris) => {
         if (ris) {
           // Solo se il caricamento è andato a buon fine, pulisci i dati locali
-          this.storage.clearData();
           console.log("loading local logs to db user.component ok");
         } else {
           console.warn("loadLocalLogs returned false - logs not saved");
@@ -173,6 +172,7 @@ ngOnInit(): void{
         }
       ).finally(() => {
         // La navigazione avviene sempre, indipendentemente dal risultato
+        this.storage.clearData();
         this.router.navigate(['']);
       });
   }

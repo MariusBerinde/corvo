@@ -34,7 +34,7 @@
             <mat-expansion-panel-header class="server-header">
               <span class="status-indicator" [class.online]="val.state" [class.offline]="!val.state"></span>
               <mat-panel-title>IP: </mat-panel-title>
-              <mat-panel-description >{{ val.ip }}</mat-panel-description>
+              <mat-panel-description > ip={{ val.ip }},name={{val.name}}</mat-panel-description>
             </mat-expansion-panel-header>
             <div class="server-details">
             <table-services [ip]="val.ip"></table-services>

@@ -53,7 +53,7 @@ submitLogin() {
                 }
             })
             .catch(error => {
-                console.error("Errore durante l'autenticazione:", error);
+                alert(`Errore durante l'autenticazione: ${error}` );
                 this.errorCredentials = !this.errorCredentials;
             });
 

@@ -238,7 +238,7 @@ deleteMail(email: string): void {
             },
             error : (error)=>{
 
-            console.error('Errore nell\'aggiunta:', error);
+            alert(`Errore nell\'aggiunta: ${error}` );
             this.approvedUsersError = 'Errore nell\'aggiunta dell\'utente';
             }
           }

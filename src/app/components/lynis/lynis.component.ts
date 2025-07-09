@@ -18,6 +18,7 @@ import { ReportViewComponent   } from '../report-view/report-view.component';
 import { HttpClientModule } from '@angular/common/http';
 
 import { finalize, Subject ,takeUntil, interval } from 'rxjs';
+import { error } from 'node:console';
 @Component({
   selector: 'app-lynis',
   imports: [
@@ -91,7 +92,7 @@ export class LynisComponent implements OnInit{
         },
         error:(error)=>{
 
-          console.log("Loading config of lynis from the db errol , load the mock data");
+          alert("Loading config of lynis from the db errol , load the mock data");
           this.acutalConfig = this.lynis.getActualConfig(this.ip);
 
         }
@@ -119,10 +120,9 @@ export class LynisComponent implements OnInit{
       (ris) => {
         if (ris) {
           // Solo se il caricamento è andato a buon fine, pulisci i dati locali
-          this.storage.clearData();
           console.log("loading local logs to db user.component ok");
         } else {
-          console.warn("loadLocalLogs returned false - logs not saved");
+          alert("loadLocalLogs returned false - logs not saved");
         }
       }
     ).catch(
@@ -132,11 +132,11 @@ export class LynisComponent implements OnInit{
         }
       ).finally(() => {
         // La navigazione avviene sempre, indipendentemente dal risultato
+        this.storage.clearData();
         this.router.navigate(['']);
       });
   }
 testDialog() {
-    //console.log("valore di mini0=", this.mini[0]?.id);
     const dialogRef = this.dialog.open(LynisRulesComponent, {
       maxWidth: '90vw',
       maxHeight: '90vh',
@@ -168,10 +168,9 @@ testDialog() {
     this.lynis.addLynisConfig(this.acutalConfig.listIdSkippedTest,this.ip).then(
       isValid => {
         if (isValid)
-          console.log("addLynisConfig added to db ");
+          alert("addLynisConfig added to db ");
         else
-          console.log("addLynisConfig not added to db ");
-
+          alert("addLynisConfig not added to db ");
 
       }
     );
@@ -210,12 +209,12 @@ testDialog() {
       if (!success) {
         // Se la scansione fallisce, resetta il timestamp per permettere un nuovo tentativo immediato
         this.lastScanTimestamp = 0;
-        console.error("Scansione fallita, timestamp resettato per permettere un nuovo tentativo.");
+        alert("Scansione fallita, timestamp resettato per permettere un nuovo tentativo.");
         this.isStarted = false;
       } else {
 
         this.isStarted = true;
-        console.log("Scansione avviata con successo.");
+        alert("Scansione avviata con successo.");
       }
     });
   }
