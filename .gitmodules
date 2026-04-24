@@ -1,0 +1,9 @@
+[submodule "front"]
+	path = front
+	url = https://github.com/MariusBerinde/corvo_front.git
+[submodule "agent"]
+	path = agent
+	url = https://github.com/MariusBerinde/agent.git
+[submodule "back"]
+	path = back
+	url = https://github.com/MariusBerinde/corvo_server.git
