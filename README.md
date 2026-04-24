@@ -19,7 +19,7 @@ Il sistema è composto da tre componenti, ciascuno in un sottomodulo Git indipen
 ```
 Corvo/
 ├── corvo_front/     # Frontend Angular (SPA)  
-├── corvo_back/      # Backend Java Spring Boot
+├── corvo_back/      # Backend Java Spring Boot + file Docker Compose
 └── corvo_agent/     # Agent Python (daemon sugli host monitorati)
 ```
 
@@ -55,24 +55,9 @@ Corvo/
 
 ---
 
-## 📦 Struttura del repository
-
-Questo repository è il punto di ingresso del progetto e contiene i file di orchestrazione Docker. I tre componenti applicativi sono inclusi come **Git submodule**.
-
-```
-Corvo/
-├── corvo_front/          # Submodule — Frontend Angular
-├── corvo_back/           # Submodule — Backend Spring Boot
-├── corvo_agent/          # Submodule — Agent Python
-├── docker-compose.yml    # Orchestrazione dei container (front + back + db + pgAdmin)
-└── .env.example          # Template variabili d'ambiente
-```
-
----
-
 ## 🐳 Architettura Docker
 
-Il sistema (frontend + backend + database) è containerizzato tramite **Docker Compose** (v3.9) e orchestrato su una rete privata interna `app_network`.
+Il sistema (frontend + backend + database) è containerizzato tramite **Docker Compose** (v3.9). Il file `docker-compose.yml` e il template `.env.example` si trovano nel submodule [`corvo_back`](./corvo_back).
 
 | Servizio | Immagine base | Porta esposta | Note |
 |---|---|---|---|
@@ -83,11 +68,7 @@ Il sistema (frontend + backend + database) è containerizzato tramite **Docker C
 
 > **Nota:** L'agent Python (`corvo_agent`) non è containerizzato — viene eseguito direttamente come processo daemon sugli host Linux da monitorare. Consulta il README di [`corvo_agent`](./corvo_agent) per le istruzioni di avvio.
 
-### Rete e resilienza
-
-- Tutti i container comunicano tramite la rete interna `app_network` (driver `bridge`) usando nomi logici DNS, senza esporre porte interne non necessarie
-- Politica di riavvio automatico `on-failure` per tutti i servizi applicativi
-- `healthcheck` configurati per `postgres` e `corvo-server` per coordinare l'ordine di avvio
+Tutti i container comunicano tramite la rete interna `app_network` (driver `bridge`) usando nomi logici DNS, senza esporre porte interne non necessarie. Sono configurati `healthcheck` e politiche di riavvio automatico `on-failure` per tutti i servizi applicativi.
 
 ---
 
@@ -111,32 +92,16 @@ Se hai già clonato il repository senza submodule:
 git submodule update --init --recursive
 ```
 
-### 2. Configura le variabili d'ambiente
+### 2. Avvia i container
+
+Il `docker-compose.yml` si trova in `corvo_back/`. Per le istruzioni complete di configurazione e avvio consulta il README di [`corvo_back`](./corvo_back).
+
+In sintesi:
 
 ```bash
+cd corvo_back
 cp .env.example .env
 # Modifica .env con i parametri del tuo ambiente
-```
-
-Le variabili principali da configurare:
-
-```env
-# Database
-POSTGRES_DB=corvo
-POSTGRES_USER=corvo_user
-POSTGRES_PASSWORD=<password>
-
-# pgAdmin
-PGADMIN_DEFAULT_EMAIL=admin@admin.com
-PGADMIN_DEFAULT_PASSWORD=<password>
-
-# Backend
-SERVER_PORT=8083
-```
-
-### 3. Avvia i container
-
-```bash
 docker compose up -d
 ```
 
@@ -145,7 +110,7 @@ I servizi saranno disponibili su:
 - **Backend API:** `http://localhost:8083`
 - **pgAdmin:** `http://localhost:8081`
 
-### 4. Avvia gli agent sugli host da monitorare
+### 3. Avvia gli agent sugli host da monitorare
 
 Per ogni host Linux da monitorare, segui le istruzioni nel README di [`corvo_agent`](./corvo_agent). In sintesi:
 
@@ -156,7 +121,7 @@ cd corvo_agent
 python3 main.py
 ```
 
-### 5. Primo accesso
+### 4. Primo accesso
 
 Al primo avvio è disponibile un utente amministratore predefinito:
 
